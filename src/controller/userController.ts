@@ -62,7 +62,6 @@ class UserController {
     }
     async verifyForgottenOTP(req:Request,res:Response){
         try {
-            console.log('req.body',req.body);
             const data = req.body
             const IsVerified =await this.userCase.verifyForgottenOTP(data)
             console.log('IsVerified',IsVerified);
@@ -75,7 +74,6 @@ class UserController {
     async resendOTP(req:Request,res:Response){
         try {
             const { userType, email } = req.params; 
-            console.log('++++++++++++++',req.params);
             if(userType === undefined){
                 res.json ({success:false,message:'Please try again..!'})
             }else{
@@ -92,6 +90,43 @@ class UserController {
             
         }
     }
+
+    async userCreate (req:Request,res:Response){
+        try {
+            const PostData = req.body
+            const Response = await this.userCase.userCreate(PostData)
+            console.log(Response);
+            
+            res.json(Response)
+        } catch (error) {
+            console.log('userCreate error in user Controller',error);
+            
+        }
+    }
+
+    async getAllPost(req:Request,res:Response){
+        try {
+
+            const userId = req.userId
+            const Response = await this.userCase.getAllPost(userId)
+            console.log('==========================',Response); 
+            res.json(Response)            
+        } catch (error) {
+            console.log('getAllPost error in userController :',error);
+        }
+    }
+
+    async postComment(req:Request,res:Response){
+        try {
+            const Response = await this.userCase.postComment(req.body,req.userId)
+            res.json(Response)
+        } catch (error) {
+            console.log('postComment error in userController :',error);
+            
+        }
+    }
 }
+
+
 
 export default UserController

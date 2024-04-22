@@ -2,9 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import User from "../../domain_entities/user";
 
 const UserSchema: Schema<User> = new Schema({
-    id: {
-        type: String
-    },
+    
     firstName: {
         type: String,
         required: true

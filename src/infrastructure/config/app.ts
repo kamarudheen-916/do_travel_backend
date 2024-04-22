@@ -7,12 +7,12 @@ dotenv.config()
 export const createServer = () =>{
     try {
         const app = express()
-        app.use(express.json({limit:'50mb'})); 
-        app.use(express.urlencoded({extended:true,limit:'50mb'})) 
+        app.use(express.json({limit:'250mb'})); 
+        app.use(express.urlencoded({extended:true,limit:'250mb'})) 
         console.log('__dirname',path.resolve(__dirname,'../../..'));
         const parentDirectory = path.resolve(__dirname,'../../..');
         app.use(express.static(path.join(parentDirectory+'/public')))
-        app.use(
+        app.use(    
             cors({
                 origin:'http://localhost:5173', 
                 methods:'GET,HEAD,PUT,PATCH,POST,DELETE',

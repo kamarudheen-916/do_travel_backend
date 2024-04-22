@@ -3,6 +3,7 @@ import Property from "../../domain_entities/property";
 import IuserRepository from "../../useCase/interface/IuserRepository";
 import { UserModel } from "../database/userModel";
 import PropertyModel from "../database/propertyModel";
+import { UserPostModel } from "../database/userPostModel";
 
 class UserRepository implements IuserRepository{
      async findByEmail(email: string,userType:string) {
@@ -16,17 +17,12 @@ class UserRepository implements IuserRepository{
         }
     }
     async saveUser(user: User|Property,userType:string) {
-      try {
-
-        console.log('user',user);
-        
+      try {  
         const result = userType === 'user' ? 
         await UserModel.create(user): 
         await PropertyModel.create(user)
         
         setTimeout(async () => {
-          console.log('settimeout ===========');
-          
           const result = userType === 'user' ? 
           await UserModel.updateOne({email:user.email},{
             $set:{
@@ -42,6 +38,39 @@ class UserRepository implements IuserRepository{
       } catch (error) {
         console.log('save user error in userRepository:',error);
         return null
+        
+      }
+    }
+    async insertUserPost(data:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
+      try {
+          const post = data.fileUrl
+          const description = data.textarea
+          const userId = data.userId
+          const Response = await UserPostModel.insertMany({post,description,userId})
+          return Response
+      } catch (error) {
+          console.log('isertUserPost error in repository');
+          return null
+          
+      }
+    }
+
+    async findPostByUserId(userId:any){
+      try {       
+       
+        const allPost = await UserPostModel.find({userId})
+        return allPost
+      } catch (error) {
+        console.log('findPostByUserIdError in user Repositoty:',error);
+      }
+    }
+
+    async findUserById(userId:string){
+      try {
+          const user = await UserModel.findOne({_id:userId})
+          return user
+      } catch (error) {
+        console.log('findUserById error in user Repository :',error);
         
       }
     }

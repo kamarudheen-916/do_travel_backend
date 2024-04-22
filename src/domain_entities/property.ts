@@ -1,5 +1,5 @@
 interface Property {
-            id?:string,
+            _id?:string,
             PropertyName: string,
             email: string,
             password: string,

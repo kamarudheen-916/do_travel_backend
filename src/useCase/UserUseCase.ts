@@ -1,6 +1,7 @@
 import User from '../domain_entities/user'
 import Property from '../domain_entities/property';
 import IuserRepository from './interface/IuserRepository'
+import { IPostRepositry } from './interface/IPostRepository';
 import IHashPassword from './interface/IhashPassword';
 import IJwtTocken from './interface/IjwtToken';
 import GenerateOTP from '../infrastructure/utils/otpGenerate';
@@ -8,11 +9,13 @@ import ICloudinary from './interface/ICloudinary';
 import SendMail from '../infrastructure/utils/sendMail';
 import { UserModel } from '../infrastructure/database/userModel';
 import PropertyModel from '../infrastructure/database/propertyModel';
+import { UserPostModel } from '../infrastructure/database/userPostModel';
 
 
 class UserUseCase{    
     constructor(
         private readonly iUserRepository : IuserRepository,
+        private readonly IpostRepository : IPostRepositry,
         private readonly hashPass : IHashPassword,
         private readonly jwt : IJwtTocken,
         private readonly cloudinary : ICloudinary,
@@ -110,23 +113,18 @@ class UserUseCase{
     async userLogin({email,password,userType}:{email:string,password:string,userType:string}){
         try {
             const isUser = await this.iUserRepository.findByEmail(email,userType)
-           
             if(!isUser){
                 return {success:false,message:'This Email does not exist..!'}
             }else{
-                console.log('password :',password);
-                
                 const isPassMatch =await this.hashPass.compare(password,isUser.password)
-                console.log('ispass======',isPassMatch);
-                
                 if(!isPassMatch){
                     return {success:false,message:'Invalid Password..!'}
                 }else if(isUser.isBlocked){
                     return {success:false,message:'User is Blocked By Admin..!'}
                 }else{
                     const JWT_KEY = process.env.JWT_KEY
-                    if(JWT_KEY){
-                        const token = this.jwt.createJWT(isUser.id as string,'User')
+                    if(JWT_KEY){   
+                        const token = this.jwt.createJWT(isUser._id as string,'user')
                         return {success:true,message:'Successfully logged in',token,user:isUser}
                     }
                 }
@@ -211,6 +209,58 @@ class UserUseCase{
             return RealOTP
         } catch (error) {
             console.log('ResenOTP erro in useUseCase',error);
+            
+        }
+    }
+
+    async userCreate (postData:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
+     try {
+        console.log('post data :', postData);
+        
+        if(postData.userId && postData.userType){
+          if(postData.userType === 'user'){
+            const fileUrl = postData.fileUrl !== ''?
+            await this.cloudinary.saveToCloudinary(postData?.fileUrl) : ''
+            postData.fileUrl = fileUrl
+           const  Response = await this.iUserRepository.insertUserPost(postData)
+                if(Response){
+                    console.log('Response:',Response);
+                    
+                    return {success:true,message:'Post successful..'}
+                }else{
+                    return {success:false,message:'Oops..! something went wrong..'}
+                }
+          }
+        }else{
+            throw new Error('undefined userId or user type : in userUserCase : in userCreate')
+        }
+     } catch (error) {
+        console.log('userCreate Error in user use case :',error);
+        
+     }
+    }
+    async getAllPost(userId:any){
+        try {
+            const allPost = await this.iUserRepository.findPostByUserId(userId)
+            if(allPost){
+                return {success:true,message:'fetch data success',allPost}
+            }else{
+                return {success:false,message:'fetch data failed'}
+            }
+        } catch (error) {
+            console.log('getAllPost error in userUseCase ',error);
+        }
+    }
+    async postComment({comment,postId}:{comment:string,postId:string},userId:string|undefined){
+        try {
+            const res = await this.IpostRepository.addComment(comment,postId,userId)
+            if(res){
+                return {success:true,message:'Comment posted.',res}
+            }else{
+                return {sucess:false,message:'oops..! Cannot post you comment..!'}
+            }
+        } catch (error) {
+            console.log('postComment error in userUseCase ',error);
             
         }
     }

@@ -2,9 +2,7 @@ import mongoose, { Schema } from "mongoose";
 import Property from "../../domain_entities/property";
 
 const PropertySchema : Schema<Property> = new Schema({
-    id:{
-        type: String
-    },
+  
     PropertyName: {
         type:String,
         required:true
