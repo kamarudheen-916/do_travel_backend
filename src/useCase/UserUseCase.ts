@@ -10,12 +10,19 @@ import SendMail from '../infrastructure/utils/sendMail';
 import { UserModel } from '../infrastructure/database/userModel';
 import PropertyModel from '../infrastructure/database/propertyModel';
 import { UserPostModel } from '../infrastructure/database/userPostModel';
+import { Rooms } from '../domain_entities/propertyRoom';
+import { IRoomRepository } from './interface/IroomRepository';
+import { searchData } from '../domain_entities/searchData';
+import { IFollowRepository } from './interface/IFollowRepository';
+import { followSchemaInterface, followerData } from '../domain_entities/follow';
 
 
 class UserUseCase{    
     constructor(
+        private readonly IfollowRepository:IFollowRepository,
         private readonly iUserRepository : IuserRepository,
         private readonly IpostRepository : IPostRepositry,
+        private readonly IRoomRepository : IRoomRepository,
         private readonly hashPass : IHashPassword,
         private readonly jwt : IJwtTocken,
         private readonly cloudinary : ICloudinary,
@@ -58,12 +65,14 @@ class UserUseCase{
             if(isProperty){
                 return {success:false,message:'This Email is already exist..!'}
             }else{
+              
+                
                 const hashedPassword =await this.hashPass.createHash(propertyData.password)
-                const licenseUrl =await this.cloudinary.saveToCloudinary(propertyData.license)
-                const profileUrl =await this.cloudinary.saveToCloudinary(propertyData.PropertyProfile)
-                propertyData.password = hashedPassword
-                propertyData.license = licenseUrl
-                propertyData.PropertyProfile = profileUrl
+                // const licenseUrl =await this.cloudinary.saveToCloudinary(propertyData.license)
+                // const profileUrl =await this.cloudinary.saveToCloudinary(propertyData.Profile)
+                // propertyData.password = hashedPassword
+                // propertyData.license = licenseUrl
+                // propertyData.Profile = profileUrl
                 const OTP =  await this.generateOTP.generateOTP()
                 propertyData.OTP = OTP.toString()
                 this.sendMail.sendMail(propertyData.PropertyName,propertyData.email,OTP)
@@ -85,7 +94,7 @@ class UserUseCase{
             const user = userType === 'user'?
             await UserModel.findById(userId):
             await PropertyModel.findById(userId)
-            console.log('OTP:',OTP,'--','real OTP :',user?.OTP,'userType:',userType);
+            // console.log('OTP:',OTP,'--','real OTP :',user?.OTP,'userType:',userType);
             
              if(OTP == user?.OTP ){
                 const result = userType === 'user' ? 
@@ -95,7 +104,7 @@ class UserUseCase{
                 await PropertyModel.updateOne({_id:userId},{$set:{
                     IsVerified:true
                 }})
-                console.log('result:============',result);
+              
                 
                return {success:true,message:'Signup successful..!'}
              }else{
@@ -124,7 +133,7 @@ class UserUseCase{
                 }else{
                     const JWT_KEY = process.env.JWT_KEY
                     if(JWT_KEY){   
-                        const token = this.jwt.createJWT(isUser._id as string,'user')
+                        const token = this.jwt.createJWT(isUser._id as string,userType)
                         return {success:true,message:'Successfully logged in',token,user:isUser}
                     }
                 }
@@ -143,7 +152,7 @@ class UserUseCase{
                 await model.updateOne({email},{$set:{OTP:RealOTP}})
                 this.sendMail.sendMail(email,email,RealOTP)
                 setTimeout(async () => {
-                    console.log('settimeout ===========');
+                    
                     
                     const result = userType === 'user' ? 
                     await UserModel.updateOne({email:email},{
@@ -194,7 +203,7 @@ class UserUseCase{
                 this.sendMail.sendMail(email,email,RealOTP)
 
                 setTimeout(async () => {
-                    console.log('settimeout ===========');
+                
                     
                     const result = userType === 'user' ? 
                     await UserModel.updateOne({email:email},{
@@ -215,23 +224,38 @@ class UserUseCase{
 
     async userCreate (postData:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
      try {
-        console.log('post data :', postData);
+    
         
         if(postData.userId && postData.userType){
+         
+            
           if(postData.userType === 'user'){
             const fileUrl = postData.fileUrl !== ''?
             await this.cloudinary.saveToCloudinary(postData?.fileUrl) : ''
             postData.fileUrl = fileUrl
            const  Response = await this.iUserRepository.insertUserPost(postData)
                 if(Response){
-                    console.log('Response:',Response);
+               
                     
                     return {success:true,message:'Post successful..'}
                 }else{
                     return {success:false,message:'Oops..! something went wrong..'}
                 }
-          }
-        }else{
+          }else if(postData.userType === 'property'){
+            const fileUrl = postData.fileUrl !== ''?
+            await this.cloudinary.saveToCloudinary(postData?.fileUrl) : ''
+            postData.fileUrl = fileUrl
+            const res = await this.iUserRepository.insertPropertyPost(postData)
+            if(res){
+              
+                
+                return {success:true,message:'Post successful..'}
+            }else{
+                return {success:false,message:'Oops..! something went wrong..'}
+            }
+        }
+        }
+        else{
             throw new Error('undefined userId or user type : in userUserCase : in userCreate')
         }
      } catch (error) {
@@ -239,21 +263,95 @@ class UserUseCase{
         
      }
     }
-    async getAllPost(userId:any){
+
+    async uploadUserProfile(userProfile:string,userId:string|undefined,userType:string|undefined){
         try {
-            const allPost = await this.iUserRepository.findPostByUserId(userId)
-            if(allPost){
-                return {success:true,message:'fetch data success',allPost}
+            
+            const fileUrl = await this.cloudinary.saveToCloudinary(userProfile)
+            const res = await this.iUserRepository.uploadUserProfile(fileUrl,userId,userType)
+            if(res.modifiedCount > 0){
+                return {success:true,message:'Profile updated..!',fileUrl}
             }else{
-                return {success:false,message:'fetch data failed'}
+                return {success:false,message:'Profile update failed..!'}
             }
         } catch (error) {
-            console.log('getAllPost error in userUseCase ',error);
+            console.log('uploadUserProfile error in userUseCase ',error);
+        }
+    } 
+    async getAllPosts(userId: any, userType: any) {
+        try {
+          
+            const allPosts = await this.iUserRepository.findPostByUserId(userId, userType);  
+            if (allPosts) {
+                const reversedPosts = allPosts.reverse(); 
+                return { success: true, message: 'fetch data success', allPosts: reversedPosts };
+            } else {
+                return { success: false, message: 'fetch data failed' };
+            }
+        } catch (error) {
+            console.log('getallPosts error in userUseCase ', error);
         }
     }
-    async postComment({comment,postId}:{comment:string,postId:string},userId:string|undefined){
+    async getAllFeeds(userId: any, userType: any) {
         try {
-            const res = await this.IpostRepository.addComment(comment,postId,userId)
+            const allFollowers:followSchemaInterface = await this.IfollowRepository.getAllFollwers(userId)
+            // console.log('///////>',  allFollowers);
+            
+            const allFeeds = await Promise.all(allFollowers.following?.map(async(Follower)=>{
+                return await this.iUserRepository.findPostByUserId(Follower.followingID, Follower.isProperty ? 'property':'user');
+            }))
+            // const allFeeds = await this.iUserRepository.findPostByUserId(userId, userType);
+            console.log('all post form get all feeds ',allFeeds);
+            
+            if (allFeeds) {
+
+                const reversedPosts = allFeeds.reverse(); 
+                return { success: true, message: 'fetch data success', allFeeds: reversedPosts };
+            } else {
+                return { success: false, message: 'fetch data failed' };
+            }
+        } catch (error) {
+            console.log('getallFeeds error in userUseCase ', error);
+        }
+    }
+    
+    async getUserData(userId:string|undefined,userType:string|undefined){
+        try {
+            
+            
+            const res = await this.iUserRepository.getUserData(userId,userType)
+            return res
+        } catch (error) {
+            console.log('get user data for edit user detail in profile error :',error);
+            
+        }
+    }
+    async updateUserData(userData:User|Property,userId:string|undefined,userType:string|undefined){
+        try {
+            const email = userData.email
+            const isUser = await this.iUserRepository.findUserById(userId,userType)
+            if(!isUser){
+                return {success : false,message:'This Email is already exists'}
+            }else{
+                 
+                if( userData.password === ''){
+                    userData.password = isUser?.password
+                }else{
+                    const password = userData.password
+                    const hashedPassword = await this.hashPass.createHash(password)
+                    userData.password = hashedPassword
+                }
+                const res = await this.iUserRepository.updateUserData(userData,userId,userType)
+                return res
+            }
+            
+        } catch (error) {
+            console.log('update user data for edit user detail in profile error :',error);
+        }
+    }
+    async postComment({comment,postId}:{comment:string,postId:string},userId:string|undefined,userType:string|undefined){
+        try {
+            const res = await this.IpostRepository.addComment(comment,postId,userId,userType)
             if(res){
                 return {success:true,message:'Comment posted.',res}
             }else{
@@ -264,7 +362,106 @@ class UserUseCase{
             
         }
     }
-   
+    async deleteComment(data:{postId:string,commentId:string,index:number,userType:string|undefined}){
+        try {
+            const res = await this.IpostRepository.deleteComment(data.postId,data.commentId,data.index,data.userType)
+            return res
+        } catch (error) {
+            console.log('delete comment error in userUserCase',error);
+        }
+    }
+
+    async editComment(data:{postId:string|undefined,commentId:string|undefined,editedComment:string},userType:string|undefined){
+        try {
+            const res = await this.IpostRepository.editComment(data.postId,data.commentId,data.editedComment,userType)
+            return res
+        } catch (error) {
+            console.log('delete comment error in userUserCase',error);
+        }
+    }
+
+    async addRoom(roomData: Rooms) {
+        try {
+           
+            
+            const images = roomData.images;
+            const cloudinaryImages = await Promise.all(images.map(async img => {
+                return await this.cloudinary.saveToCloudinary(img);
+            }));
+            roomData.images = cloudinaryImages
+            const res = await this.IRoomRepository.addRoom(roomData);
+            return res;
+        } catch (error) {
+            console.log('add room error in userUseCase:', error);
+            throw error;
+        }
+    }
+    
+    async fetchRoomData (userId:any){
+        try {
+            const res = await this.IRoomRepository.fetchRoomData(userId)
+            return res
+        } catch (error) {
+            console.log('add room error in userUseCase :',error);
+            
+        }
+    }
+    async userSearch (search_Data:any,userId:string|undefined,userType:string|undefined){
+        try {
+            
+            const searchedUsers = await this.iUserRepository.userSearch(search_Data,userId,userType)
+            const searchedProperty = await this.IpostRepository.propertySearch(search_Data,userId,userType)
+           
+            
+            let searchResult:searchData[] =[];
+            searchedUsers.forEach((user, index) => {
+                
+                
+                const result: searchData = {
+                    name: user.firstName, 
+                    profileId: user._id, 
+                    profile:user.Profile,
+                    isProperty:false,
+                };
+                searchResult.push(result); 
+            });
+            searchedProperty.forEach((Property, index) => {
+               
+                const result: searchData = {
+                    name: Property.PropertyName ,
+                    profileId: Property._id, 
+                    profile:Property.PropertyProfile,
+                    isProperty:true
+                };
+                searchResult.push(result); 
+            });
+            return searchResult
+        } catch (error) {
+            console.log('add room error in userUseCase :',error);
+            
+        }
+    }
+
+
+   async setThemeMode(mode: string|undefined,userId:string|undefined) {
+        try {
+           const res = await this.iUserRepository.setThemeMode(mode,userId)
+           return res
+        } catch (error) {
+            console.log('setThemeMode error in userUseCase:', error);
+            throw error;
+        }
+    }
+    
+   async getThemeMode(userId:string|undefined) {
+    try {
+       const res = await this.iUserRepository.getThemeMode(userId)
+       return res
+    } catch (error) {
+        console.log('setThemeMode error in userUseCase:', error);
+        throw error;
+    }
+}
 }
 
 export default UserUseCase

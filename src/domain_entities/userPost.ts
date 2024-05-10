@@ -1,7 +1,10 @@
  export interface comments {
     comment:string,
-    id:string,
-    comment_likes:number
+    commentedId:string,
+    comment_likes:number,
+    _id?:string,
+    commentTime:Date
+
 }
 export interface UserPost {
     _id?:string,

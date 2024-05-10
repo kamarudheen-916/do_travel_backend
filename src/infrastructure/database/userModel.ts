@@ -31,11 +31,11 @@ const UserSchema: Schema<User> = new Schema({
     },
     DOB: {
         type: Date,
-        required: true
+      
     },
     Country: {
         type: String,
-        required: true
+      
     },
     State: {
         type: String,
@@ -54,11 +54,11 @@ const UserSchema: Schema<User> = new Schema({
     },
     IsVerified: {
         type: Boolean,
-        required: true
+      
     },
     OTP: {
         type: String,
-        required: true
+      
     },
     createdAt: {
         type: Date,

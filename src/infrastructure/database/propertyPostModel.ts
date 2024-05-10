@@ -6,10 +6,9 @@ const commentSchema :Schema<comments> = new Schema({
     commentedId:{type:String},
     comment_likes:{type:Number,default:0},
     commentTime:{type:Date,default : new Date()}
-
 })
 
-const UserPostSchema:Schema<UserPost>  = new Schema({
+const propertyPostSchema:Schema<UserPost>  = new Schema({
     userId:{type:String},
     post:{type:String},
     description:{type:String},
@@ -21,5 +20,5 @@ const UserPostSchema:Schema<UserPost>  = new Schema({
 
 })
 
-const UserPostModel = mongoose.model<UserPost>('UserPost',UserPostSchema)
-export  {UserPostModel}
+const propertyPostModel = mongoose.model<UserPost>('propertyPost',propertyPostSchema)
+export  {propertyPostModel}

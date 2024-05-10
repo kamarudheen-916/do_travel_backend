@@ -12,7 +12,7 @@ const  userProfileStorage = multer.diskStorage({
 
 const  propertyStorage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, './public/propertyProfileImages/');
+        cb(null, './public/Images/');
     }, 
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)

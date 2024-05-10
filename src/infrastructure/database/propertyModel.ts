@@ -23,34 +23,34 @@ const PropertySchema : Schema<Property> = new Schema({
     },
     Address:{
         type:String,
-        required:true
+       
     },
     TypeOfStay:{
         type:[String],
-        required:true
+       
     },
     Speciality:{
         type:[String],
-        required:true
+       
     },
     MobileNumber:{
         type:String
     },
     license:{
         type:String,
-        required:true
+       
     },
     PropertyProfile:{
         type:String,
-        required:true
+       
     },
     IsVerified :{
         type:Boolean,
-        required:true
+       
     },
     OTP :{
         type:String,
-        required:true
+        
     }
 })
 
