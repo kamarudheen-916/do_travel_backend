@@ -3,11 +3,12 @@ import Property from "../../domain_entities/property";
 import IuserRepository from "../../useCase/interface/IuserRepository";
 import { UserModel } from "../database/userModel";
 import PropertyModel from "../database/propertyModel";
-import { UserPostModel } from "../database/userPostModel";
+import { PostModel } from "../database/PostModel";
 import { propertyPostModel } from "../database/propertyPostModel";
 import mongoose from "mongoose";
 import { searchData } from "../../domain_entities/searchData";
 import ThemeModel from "../database/themeModel";
+import { profile } from "console";
 
 class UserRepository implements IuserRepository{
      async findByEmail(email: string,userType:string) {
@@ -45,12 +46,15 @@ class UserRepository implements IuserRepository{
         
       }
     }
-    async insertUserPost(data:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
+    async insertPost(data:{fileUrl:string,textarea:string,userId:string|null,userType:string|null,userName:any,Profile:any}){
       try {
           const post = data.fileUrl
           const description = data.textarea
           const userId = data.userId
-          const Response = await UserPostModel.insertMany({post,description,userId})
+          const isProperty = data.userType === 'property' ? true : false 
+          const PostProfile = data.Profile
+          const PostName = data.userName
+          const Response = await PostModel.insertMany({post,description,userId,isProperty,PostProfile,PostName})
           return Response
       } catch (error) {
           console.log('isertUserPost error in repository');
@@ -58,23 +62,22 @@ class UserRepository implements IuserRepository{
           
       }
     }
-    async insertPropertyPost(data:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
-      try {
-        const post = data.fileUrl
-        const description = data.textarea
-        const userId = data.userId
-        const Response = await propertyPostModel.insertMany({post,description,userId})
-        return Response
-      } catch (error) {
-        console.log('insertPropertyPost error in userRepository',error);
-        return null
-      }
-    }
+    // async insertPropertyPost(data:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
+    //   try {
+    //     const post = data.fileUrl
+    //     const description = data.textarea
+    //     const userId = data.userId
+    //     const Response = await propertyPostModel.insertMany({post,description,userId})
+    //     return Response
+    //   } catch (error) {
+    //     console.log('insertPropertyPost error in userRepository',error);
+    //     return null
+    //   }
+    // }
 
     async findPostByUserId(userId:string|undefined,userType:string|undefined){
       try {       
-        const Model = userType === 'user' ? UserPostModel : propertyPostModel
-        const allPost = await Model.find({userId})
+        const allPost = await PostModel.find({userId})
         return allPost
       } catch (error) {
         console.log('findPostByUserIdError in user Repositoty:',error);
@@ -187,6 +190,16 @@ class UserRepository implements IuserRepository{
       
     }
   }
+   async propertySearch(searchData: string, userId: string | undefined, userType: string | undefined): Promise<any> {
+        try {
+          const searchRegex = new RegExp(searchData, 'i');
+          const users = await PropertyModel.find({ PropertyName: { $regex: searchRegex } } );
+          return users;
+      } catch (error) {
+          console.log('User search error:', error);
+          throw error;
+      }
+      }
 }
 
 export default UserRepository 

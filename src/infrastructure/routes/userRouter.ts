@@ -57,6 +57,8 @@ router.put('/updateUserData',UserAuth,(req,res)=>uController.updateUserData(req,
 router.post('/postComment',UserAuth,(req,res)=>uController.postComment(req,res))
 router.delete('/deleteComment',UserAuth,(req,res)=>uController.deleteComment(req,res))
 router.put('/editComment',UserAuth,(req,res)=>uController.editComment(req,res))
+router.put('/updateRating',UserAuth,(req,res)=>uController.updateRating(req,res))
+
 router.put('/uploadImg',UserAuth,(req,res)=>uController.uploadImg(req,res))
 router.post('/propertyCreate',PropertyAuth,(req,res)=>pController.propertyCreate(req,res))
 router.post('/addRoom',PropertyAuth,(req,res)=>pController.addRoom(req,res))

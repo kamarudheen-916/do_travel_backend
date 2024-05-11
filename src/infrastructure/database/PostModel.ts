@@ -6,6 +6,7 @@ const commentSchema :Schema<comments> = new Schema({
     commentedId:{type:String},
     comment_likes:{type:Number,default:0},
     commentTime:{type:Date,default : new Date()}
+
 })
 
 
@@ -15,7 +16,7 @@ const ratingSchema :Schema<ratingData> = new Schema({
     ratedDate:{type:Date,default : new Date()}
 })
 
-const propertyPostSchema:Schema<UserPost>  = new Schema({
+const PostSchema:Schema<UserPost>  = new Schema({
     userId:{type:String},
     post:{type:String},
     description:{type:String},
@@ -24,8 +25,11 @@ const propertyPostSchema:Schema<UserPost>  = new Schema({
     like:{type:Number,default:0},
     comments:{type:[commentSchema]},
     ratings:{type:[ratingSchema]},
+    isProperty:{type:Boolean},
+    PostProfile:{type:String},
+    PostName:{type:String},
 
 })
 
-const propertyPostModel = mongoose.model<UserPost>('propertyPost',propertyPostSchema)
-export  {propertyPostModel}
+const PostModel = mongoose.model<UserPost>('Post',PostSchema)
+export  {PostModel}

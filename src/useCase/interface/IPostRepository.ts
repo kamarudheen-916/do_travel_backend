@@ -5,6 +5,5 @@ export interface IPostRepositry{
     addComment(comment:string,postId:string,userId:string|undefined,userType:string|undefined):Promise<any>
     deleteComment(postId:string,commentId:string,index:number,userType:string|undefined):Promise<any>
     editComment(postId:string|undefined,commentId:string|undefined,editedComment:string,userType:string|undefined):Promise<any>
-    propertySearch (searchData:string,userId:string|undefined,userType:string|undefined):Promise<Property[]>
-
+    updateRating(postId:string|undefined,rating:number|undefined,userId:string|undefined):Promise<any>
 }

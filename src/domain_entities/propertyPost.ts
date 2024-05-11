@@ -6,6 +6,6 @@ export interface UserPost {
     date:string,
     like:string,
     comments:[''],
-    reate:string,
+    ratings:number,
 }
 

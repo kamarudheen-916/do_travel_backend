@@ -92,10 +92,12 @@ class FollowRepository implements IFollowRepository {
       );
       console.log('isAlreadyRequested:',isAlreadyRequested);
       
-      if (isAlreadyRequested) {
+      if (isAlreadyRequested && isAlreadyRequested.length > 0) {
   
         // const isAccepted = doc.following.some((item)=>item.isAccepted)
         return { success: true,isAccepted:isAlreadyRequested[0]?.isAccepted };
+      }else{
+        return {success:false}
       }
     } catch (error) {
       console.error("Error checkIsFollwoed:", error);

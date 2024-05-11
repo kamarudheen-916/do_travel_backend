@@ -9,7 +9,7 @@ import ICloudinary from './interface/ICloudinary';
 import SendMail from '../infrastructure/utils/sendMail';
 import { UserModel } from '../infrastructure/database/userModel';
 import PropertyModel from '../infrastructure/database/propertyModel';
-import { UserPostModel } from '../infrastructure/database/userPostModel';
+import { PostModel } from '../infrastructure/database/PostModel';
 import { Rooms } from '../domain_entities/propertyRoom';
 import { IRoomRepository } from './interface/IroomRepository';
 import { searchData } from '../domain_entities/searchData';
@@ -222,38 +222,19 @@ class UserUseCase{
         }
     }
 
-    async userCreate (postData:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
+    async userCreate (postData:{fileUrl:string,textarea:string,userId:string|null,userType:string|null,userName:any,Profile:any}){
      try {
-    
-        
-        if(postData.userId && postData.userType){
-         
-            
-          if(postData.userType === 'user'){
+
+        if(postData.userId && postData.userType){   
             const fileUrl = postData.fileUrl !== ''?
             await this.cloudinary.saveToCloudinary(postData?.fileUrl) : ''
             postData.fileUrl = fileUrl
-           const  Response = await this.iUserRepository.insertUserPost(postData)
+           const  Response = await this.iUserRepository.insertPost(postData)
                 if(Response){
-               
-                    
                     return {success:true,message:'Post successful..'}
                 }else{
                     return {success:false,message:'Oops..! something went wrong..'}
                 }
-          }else if(postData.userType === 'property'){
-            const fileUrl = postData.fileUrl !== ''?
-            await this.cloudinary.saveToCloudinary(postData?.fileUrl) : ''
-            postData.fileUrl = fileUrl
-            const res = await this.iUserRepository.insertPropertyPost(postData)
-            if(res){
-              
-                
-                return {success:true,message:'Post successful..'}
-            }else{
-                return {success:false,message:'Oops..! something went wrong..'}
-            }
-        }
         }
         else{
             throw new Error('undefined userId or user type : in userUserCase : in userCreate')
@@ -294,18 +275,17 @@ class UserUseCase{
     }
     async getAllFeeds(userId: any, userType: any) {
         try {
-            const allFollowers:followSchemaInterface = await this.IfollowRepository.getAllFollwers(userId)
-            // console.log('///////>',  allFollowers);
-            
-            const allFeeds = await Promise.all(allFollowers.following?.map(async(Follower)=>{
-                return await this.iUserRepository.findPostByUserId(Follower.followingID, Follower.isProperty ? 'property':'user');
+            const allFollowings:followSchemaInterface = await this.IfollowRepository.getAllFollwers(userId)
+            const allFeeds = await Promise.all(allFollowings.following?.map(async(following)=>{
+                let feeds = []
+                if(following.isAccepted){
+                    feeds = await this.iUserRepository.findPostByUserId(following.followingID, following.isProperty ? 'property':'user');
+                }
+                return feeds
             }))
-            // const allFeeds = await this.iUserRepository.findPostByUserId(userId, userType);
-            console.log('all post form get all feeds ',allFeeds);
-            
             if (allFeeds) {
 
-                const reversedPosts = allFeeds.reverse(); 
+                const reversedPosts = allFeeds.reverse().flat(); 
                 return { success: true, message: 'fetch data success', allFeeds: reversedPosts };
             } else {
                 return { success: false, message: 'fetch data failed' };
@@ -379,6 +359,14 @@ class UserUseCase{
             console.log('delete comment error in userUserCase',error);
         }
     }
+    async updateRating(RatingData:{postId:string|undefined,rating:number|undefined},userId:string|undefined){
+        try {
+            const res = await this.IpostRepository.updateRating(RatingData.postId,RatingData.rating,userId)
+            return res
+        } catch (error) {
+            console.log('delete comment error in userUserCase',error);
+        }
+    }
 
     async addRoom(roomData: Rooms) {
         try {
@@ -410,7 +398,7 @@ class UserUseCase{
         try {
             
             const searchedUsers = await this.iUserRepository.userSearch(search_Data,userId,userType)
-            const searchedProperty = await this.IpostRepository.propertySearch(search_Data,userId,userType)
+            const searchedProperty = await this.iUserRepository.propertySearch(search_Data,userId,userType)
            
             
             let searchResult:searchData[] =[];

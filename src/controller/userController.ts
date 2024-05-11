@@ -171,6 +171,7 @@ class UserController {
     }
     async postComment(req:Request,res:Response){
         try {
+            console.log(req.body);
             const Response = await this.userCase.postComment(req.body,req.userId,req.userType)
             res.json(Response)
         } catch (error) {
@@ -192,8 +193,22 @@ class UserController {
     async editComment(req:Request,res:Response){
         try {
             const editData = req.body
+            console.log(editData);
+            
             const userType = req.userType
              const Response = await this.userCase.editComment(editData,userType)
+           
+             return res.json(Response)
+        } catch (error) {
+            console.log('edit comment error in userController :',error);
+        }
+    }
+    async updateRating(req:Request,res:Response){
+        try {
+            const RatingData = req.body
+            console.log('RatingData:',RatingData);
+            const userId = req.userId
+             const Response = await this.userCase.updateRating(RatingData,userId)
            
              return res.json(Response)
         } catch (error) {
