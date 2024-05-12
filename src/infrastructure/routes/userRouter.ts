@@ -58,6 +58,10 @@ router.post('/postComment',UserAuth,(req,res)=>uController.postComment(req,res))
 router.delete('/deleteComment',UserAuth,(req,res)=>uController.deleteComment(req,res))
 router.put('/editComment',UserAuth,(req,res)=>uController.editComment(req,res))
 router.put('/updateRating',UserAuth,(req,res)=>uController.updateRating(req,res))
+router.put('/saveOrUnSavePost',UserAuth,(req,res)=>uController.saveOrUnSavePost(req,res))
+router.get('/isPostSaved',UserAuth,(req,res)=>uController.isPostSaved(req,res))
+
+
 
 router.put('/uploadImg',UserAuth,(req,res)=>uController.uploadImg(req,res))
 router.post('/propertyCreate',PropertyAuth,(req,res)=>pController.propertyCreate(req,res))

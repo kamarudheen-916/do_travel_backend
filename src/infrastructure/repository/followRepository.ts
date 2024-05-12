@@ -24,12 +24,6 @@ class FollowRepository implements IFollowRepository {
       const followingDoc = await followModel.findOne({ userId: followerId });
       const requesterDoc = await followModel.findOne({userId:requesterId})
       if (followingDoc) {
-        // const isAlreadyRequested = followingDoc.follower.some(
-        //   (item) => item.followerID === requesterId
-        // );
-        // if (isAlreadyRequested) {
-        //   return { success: false, message: "Already following" };
-        // }
         followingDoc.follower.push(data);
         await followingDoc.save();
       } else {
@@ -55,18 +49,19 @@ class FollowRepository implements IFollowRepository {
   }
  async unFollowReqest({requesterId,followerId,isProperty,}: FollowReq): Promise<any> {
   try {
-    const doc = await followModel.findOne({ userId: followerId });
-    if(doc){
-      const following_data = doc.following.filter((item)=>{
-        return item.followingID === requesterId
-      })
-      const findIndex = doc.following.indexOf(following_data[0])
-      doc.following.splice(findIndex,1)
-      doc.save()
-      return {success:true,message:'unfollow success'}
-    }else{
-      return {success:false,message:'unfollow failed'}
+    const followingDoc = await followModel.findOne({ userId: followerId });
+    const requesterDoc = await followModel.findOne({userId:requesterId})
+    if(followingDoc){
+      const index = followingDoc.follower.findIndex((item)=>item.followerID === requesterId)
+      followingDoc.follower.splice(index,1)
+      await followingDoc.save()
     }
+    if(requesterDoc){
+      const index = requesterDoc.following.findIndex((item)=>item.followingID === followerId)
+      requesterDoc.following.splice(index,1)
+      await requesterDoc.save()
+    }
+    return {success:true}
   } catch (error) {
     console.log('Error unfollow request :',error );
     return {success:false,error}

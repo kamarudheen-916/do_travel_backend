@@ -2,6 +2,7 @@ import { IPostRepositry} from "../../useCase/interface/IPostRepository";
 import PropertyModel from "../database/propertyModel";
 import { propertyPostModel } from "../database/propertyPostModel";
 import { PostModel } from "../database/PostModel";
+import savePostModel from "../database/savePostModel";
 
 class PostRepository implements IPostRepositry  {
     async addComment(comment: string, postId: string, userId: string,userType:string|undefined): Promise<any> {
@@ -71,7 +72,7 @@ class PostRepository implements IPostRepositry  {
                 ratedDate:new Date()
             }
             const doc = await PostModel.findOne({_id:postId})
-            console.log('////////////////\\\\\\\\\\',doc);
+            
 
             if(doc){
                 const isAlreadyRated =  doc.ratings.find((item) =>item.raterId === userId)
@@ -95,6 +96,58 @@ class PostRepository implements IPostRepositry  {
           
         } catch (error) {
             console.log('update Rating error :',error);
+            
+        }
+    }
+    async saveOrUnSavePost(postId: string, save_or_unsave: string, userId: string | undefined): Promise<any> {
+        try {
+            
+            if(save_or_unsave == 'save'){
+             const res = await savePostModel.updateOne({userId},{$push:{postIds:postId}},{upsert:true})
+             console.log('save post response :',res);
+             
+             if(res.modifiedCount>0 || res.upsertedCount> 0){
+                return {success:true,message:'Your post is saved..!'}
+             }else{
+                return {success:false,message:'Oops..! There is an issue when saving the post.'}
+             }
+            }else if(save_or_unsave == 'unsave'){
+                const doc = await savePostModel.findOne({userId})
+                if(doc){
+                  const index =   doc.postIds.findIndex((item)=>item === postId)
+                  if(index){
+                    doc.postIds.splice(index,1)
+                    await doc.save()
+                    return {success:true,message:'Your post is removed..!'}
+
+                  }else{
+                    return {success:false,message:'Oops..! There is no such post.'}
+                  }
+                }
+            }else{
+                return {success:false,message:'cannot get the data from front end ... for developer'}
+            }
+        } catch (error) {
+            console.log('save or unsave post error in post repository :',error);
+            
+        }
+    }
+    async  isPostSaved(postId: any, userId: string | undefined): Promise<any> {
+        try {
+            const doc = await savePostModel.findOne({userId})
+            if(doc){
+                const isSaved  = doc.postIds.includes(postId)
+                console.log('is post saved ? :',isSaved);
+                
+                if(isSaved){
+                    return {success:true,message:'This post is saved'}
+                }else{
+                    return {success:false,message:'cannot find the post'}
+                }
+            }
+            return {success:false,message:'cannot find the post'}
+        } catch (error) {
+            console.log('is post saved error in post repositiory:',error);
             
         }
     }

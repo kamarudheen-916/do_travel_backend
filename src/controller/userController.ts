@@ -215,6 +215,30 @@ class UserController {
             console.log('edit comment error in userController :',error);
         }
     }
+    async saveOrUnSavePost(req:Request,res:Response){
+        try {
+            const {postId,isSave} =  req.body
+            const userId = req.userId
+            const save_or_unsave = isSave ? 'unsave' :'save'
+            console.log('save or unsave :',save_or_unsave);
+            
+             const Response = await this.userCase.saveOrUnSavePost(postId,save_or_unsave,userId)
+           
+             return res.json(Response)
+        } catch (error) {
+            console.log('saveOrUnSavePost error in userController :',error);
+        }
+    }
+    async isPostSaved(req:Request,res:Response){
+        try {
+            const userId = req.userId
+            const {postId} = req.query
+            const Response = await this.userCase.isPostSaved(postId,userId)
+            res.json(Response)
+        } catch (error) {
+            console.log('isPostSaved error in userController :',error);
+        }
+    }
     async uploadImg (req:Request,res:Response){
         try {
             const userProfile = req.body.fileURL

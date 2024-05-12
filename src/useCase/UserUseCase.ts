@@ -367,7 +367,22 @@ class UserUseCase{
             console.log('delete comment error in userUserCase',error);
         }
     }
-
+    async saveOrUnSavePost(postId:string,save_or_unsave:string,userId:string|undefined){
+        try {
+            const res = await this.IpostRepository.saveOrUnSavePost(postId,save_or_unsave,userId)
+            return res
+        } catch (error) {
+            console.log('delete comment error in userUserCase',error);
+        }
+    }
+    async isPostSaved(postId:any,userId:string|undefined){
+        try {
+            const res = await this.IpostRepository.isPostSaved(postId,userId)
+            return res
+        } catch (error) {
+            console.log('delete comment error in userUserCase',error);
+        }
+    }
     async addRoom(roomData: Rooms) {
         try {
            
