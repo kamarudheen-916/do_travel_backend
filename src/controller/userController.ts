@@ -229,6 +229,18 @@ class UserController {
             console.log('saveOrUnSavePost error in userController :',error);
         }
     }
+    async likeOrUnLikePost(req:Request,res:Response){
+        try {            
+            const {postId,isLiked} =  req.body
+            const userId = req.userId
+            const Like_or_unLike = isLiked ? 'unlike' :'like'
+            console.log('like or unlike :',Like_or_unLike);
+             const Response = await this.userCase.likeOrUnLikePost(postId,Like_or_unLike,userId)
+             return res.json(Response)
+        } catch (error) {
+            console.log('likeOrUnLikePost error in userController :',error);
+        }
+    }
     async isPostSaved(req:Request,res:Response){
         try {
             const userId = req.userId
@@ -237,6 +249,35 @@ class UserController {
             res.json(Response)
         } catch (error) {
             console.log('isPostSaved error in userController :',error);
+        }
+    }
+    async isPostLiked(req:Request,res:Response){
+        try {
+            const userId = req.userId
+            const {postId} = req.query
+            const Response = await this.userCase.isPostLiked(postId,userId)
+            res.json(Response)
+        } catch (error) {
+            console.log('isPostLiked error in userController :',error);
+        }
+    }
+    async fetchPostLikersData(req:Request,res:Response){
+        try {
+            const {postId} = req.query
+            const Response = await this.userCase.fetchPostLikersData(postId)
+            res.json(Response)
+        } catch (error) {
+            console.log('isPostLiked error in userController :',error);
+        }
+    }
+    async deletePost(req:Request,res:Response){
+        try {
+            const userId = req.userId
+            const {postId} = req.query
+            const Response = await this.userCase.deletePost(postId,userId)
+            res.json(Response)
+        } catch (error) {
+            console.log('deletePost error in userController :',error);
         }
     }
     async uploadImg (req:Request,res:Response){

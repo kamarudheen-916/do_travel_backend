@@ -8,5 +8,11 @@ export interface IPostRepositry{
     updateRating(postId:string|undefined,rating:number|undefined,userId:string|undefined):Promise<any>
     saveOrUnSavePost(postId:string,save_or_unsave:string,userId:string|undefined) : Promise<any>
     isPostSaved(postId:any,userId:string|undefined):Promise<any>
+    likeOrUnLikePost(postId:string,Like_or_unLike:string,userId:string|undefined) : Promise<any>
+    isPostLiked(postId:any,userId:string|undefined):Promise<any>
+    fetchPostLikersData(postId:any):Promise<any>
+    deletePost(postId:any,userId:any):Promise<any>
+
+
     
 }

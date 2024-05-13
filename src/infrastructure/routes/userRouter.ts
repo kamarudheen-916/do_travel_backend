@@ -60,6 +60,13 @@ router.put('/editComment',UserAuth,(req,res)=>uController.editComment(req,res))
 router.put('/updateRating',UserAuth,(req,res)=>uController.updateRating(req,res))
 router.put('/saveOrUnSavePost',UserAuth,(req,res)=>uController.saveOrUnSavePost(req,res))
 router.get('/isPostSaved',UserAuth,(req,res)=>uController.isPostSaved(req,res))
+router.put('/likeOrUnLikePost',UserAuth,(req,res)=>uController.likeOrUnLikePost(req,res))
+router.get('/isPostLiked',UserAuth,(req,res)=>uController.isPostLiked(req,res))
+router.get('/fetchPostLikersData',UserAuth,(req,res)=>uController.fetchPostLikersData(req,res))
+router.delete('/deletePost',UserAuth,(req,res)=>uController.deletePost(req,res))
+
+
+
 
 
 

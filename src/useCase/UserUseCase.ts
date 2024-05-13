@@ -375,12 +375,46 @@ class UserUseCase{
             console.log('delete comment error in userUserCase',error);
         }
     }
+    
+    async likeOrUnLikePost(postId:string,Like_or_unLike:string,userId:string|undefined){
+        try {
+            const res = await this.IpostRepository.likeOrUnLikePost(postId,Like_or_unLike,userId)
+            return res
+        } catch (error) {
+            console.log('delete comment error in userUserCase',error);
+        }
+    }
+    
     async isPostSaved(postId:any,userId:string|undefined){
         try {
             const res = await this.IpostRepository.isPostSaved(postId,userId)
             return res
         } catch (error) {
-            console.log('delete comment error in userUserCase',error);
+            console.log('isPostSaved error in userUserCase',error);
+        }
+    }
+    async isPostLiked(postId:any,userId:string|undefined){
+        try {
+            const res = await this.IpostRepository.isPostLiked(postId,userId)
+            return res
+        } catch (error) {
+            console.log('isPostLiked error in userUserCase',error);
+        }
+    }
+    async fetchPostLikersData(postId:any){
+        try {
+            const res = await this.IpostRepository.fetchPostLikersData(postId)
+            return res
+        } catch (error) {
+            console.log('isPostLiked error in userUserCase',error);
+        }
+    }
+    async deletePost(postId:any,userId:any){
+        try {
+            const res = await this.IpostRepository.deletePost(postId,userId)
+            return res
+        } catch (error) {
+            console.log('isPostLiked error in userUserCase',error);
         }
     }
     async addRoom(roomData: Rooms) {

@@ -22,7 +22,7 @@ const PostSchema:Schema<UserPost>  = new Schema({
     description:{type:String},
     location:{type:String},
     date:{type:Date,default:Date.now},
-    like:{type:Number,default:0},
+    like:{type:[String]},
     comments:{type:[commentSchema]},
     ratings:{type:[ratingSchema]},
     isProperty:{type:Boolean},

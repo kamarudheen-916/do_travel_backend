@@ -13,6 +13,8 @@ export interface ratingData{
     ratedDate:Date, 
 }
 
+
+
 export interface UserPost {
     _id?:string,
     userId:string,
@@ -21,7 +23,7 @@ export interface UserPost {
     description:string,
     location:string,
     date:Date,
-    like:Number,
+    like:[string],
     comments:comments[],
     ratings:[ratingData],
     PostProfile:string,
