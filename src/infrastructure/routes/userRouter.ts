@@ -17,6 +17,9 @@ import RoomRepository from "../repository/roomRepository";
 import FollowController from "../../controller/followController";
 import FollowUseCase from "../../useCase/FollowUseCase";
 import FollowRepository from "../repository/followRepository";
+import BookingController from "../../controller/bookingController";
+import BookingUseCase from "../../useCase/bookingUseCase";
+import BookingRepository from "../repository/BookingRepository";
 const router = express.Router() 
 const cloudinary = new Cloudinary()
 const generateOTP = new GenerateOTP()
@@ -34,6 +37,10 @@ const pController = new propertyController(usercase)
 
 const fUsecase = new FollowUseCase(followRepository,userRepository)
 const followController= new FollowController(fUsecase)
+
+const bookingRepository = new BookingRepository()
+const bUseCase = new BookingUseCase(bookingRepository)
+const bookingController = new BookingController(bUseCase)
 
 
 router.post('/signup_user',localVariables,(req,res)=>uController.signUpUser(req,res))
@@ -90,6 +97,11 @@ router.get('/fetchFollowerOriginalData',UserAuth,(req,res)=>followController.fet
 
 router.put('/setThemeMode',UserAuth,(req,res)=>uController.setThemeMode(req,res))
 router.get('/getThemeMode',UserAuth,(req,res)=>uController.getThemeMode(req,res))
+
+
+router.post('/confirmBooking',UserAuth,(req,res)=>bookingController.confirmBooking(req,res))
+router.get('/fetchAllBookings',UserAuth,(req,res)=>bookingController.fetchAllBookings(req,res))
+router.put('/cancelBookings',UserAuth,(req,res)=>bookingController.cancelBookings(req,res))
 
 
 export default router  
