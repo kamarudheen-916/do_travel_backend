@@ -78,8 +78,6 @@ class FollowUseCase{
             const Res:followSchemaInterface = await this.IfollowRepo.getAllFollwers(userId)
              followingData = Res.following.filter((item)=>item.isAccepted)
              followerData = Res.follower.filter((item)=>item.isAccepted)
-            console.log('userid:**//--+++:',{followerData:followerData,followingData:followingData});
-
             return {followerData:followerData,followingData:followingData}
         } catch (error) {
             console.log('Followrequest error in Follow user case :',error);

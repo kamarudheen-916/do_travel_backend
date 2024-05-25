@@ -68,11 +68,7 @@ class UserUseCase{
               
                 
                 const hashedPassword =await this.hashPass.createHash(propertyData.password)
-                // const licenseUrl =await this.cloudinary.saveToCloudinary(propertyData.license)
-                // const profileUrl =await this.cloudinary.saveToCloudinary(propertyData.Profile)
-                // propertyData.password = hashedPassword
-                // propertyData.license = licenseUrl
-                // propertyData.Profile = profileUrl
+                propertyData.password = hashedPassword
                 const OTP =  await this.generateOTP.generateOTP()
                 propertyData.OTP = OTP.toString()
                 this.sendMail.sendMail(propertyData.PropertyName,propertyData.email,OTP)
@@ -121,6 +117,8 @@ class UserUseCase{
 
     async userLogin({email,password,userType}:{email:string,password:string,userType:string}){
         try {
+            
+            
             const isUser = await this.iUserRepository.findByEmail(email,userType)
             if(!isUser){
                 return {success:false,message:'This Email does not exist..!'}
@@ -163,7 +161,7 @@ class UserUseCase{
                       $set:{
                         OTP:'****'
                       }})
-                  }, 30000);
+                  }, 90000);
                 const hashedPassword = await this.hashPass.createHash(newPassword)
                 return {success:true,email,hashedPassword,userType,RealOTP}
             }else{
@@ -214,7 +212,7 @@ class UserUseCase{
                       $set:{
                         OTP:'****'
                       }})
-                  }, 30000);
+                  }, 90000);
             return RealOTP
         } catch (error) {
             console.log('ResenOTP erro in useUseCase',error);
@@ -245,7 +243,7 @@ class UserUseCase{
      }
     }
 
-    async uploadUserProfile(userProfile:string,userId:string|undefined,userType:string|undefined){
+    async uploadUserProfile(userProfile:string,userId:any,userType:any){
         try {
             
             const fileUrl = await this.cloudinary.saveToCloudinary(userProfile)
@@ -276,6 +274,7 @@ class UserUseCase{
     async getAllFeeds(userId: any, userType: any) {
         try {
             const allFollowings:followSchemaInterface = await this.IfollowRepository.getAllFollwers(userId)
+           if(allFollowings.following ){        
             const allFeeds = await Promise.all(allFollowings.following?.map(async(following)=>{
                 let feeds = []
                 if(following.isAccepted){
@@ -290,12 +289,13 @@ class UserUseCase{
             } else {
                 return { success: false, message: 'fetch data failed' };
             }
+           }
         } catch (error) {
             console.log('getallFeeds error in userUseCase ', error);
         }
     }
     
-    async getUserData(userId:string|undefined,userType:string|undefined){
+    async getUserData(userId:any,userType:any){
         try {
             
             
@@ -306,7 +306,7 @@ class UserUseCase{
             
         }
     }
-    async updateUserData(userData:User|Property,userId:string|undefined,userType:string|undefined){
+    async updateUserData(userData:User|Property,userId:any,userType:any){
         try {
             const email = userData.email
             const isUser = await this.iUserRepository.findUserById(userId,userType)
@@ -342,6 +342,19 @@ class UserUseCase{
             
         }
     }
+    async reportPost(data:any){
+        try {
+            const res = await this.IpostRepository.reportPost(data)
+            if(res){
+                return {success:true,message:'Your Report is successfull..'}
+            }else{
+                return {sucess:false,message:'oops..!, you cannot report on this post'}
+            }
+        } catch (error) {
+            console.log('postComment error in userUseCase ',error);
+            
+        }
+    }
     async deleteComment(data:{postId:string,commentId:string,index:number,userType:string|undefined}){
         try {
             const res = await this.IpostRepository.deleteComment(data.postId,data.commentId,data.index,data.userType)
@@ -359,9 +372,9 @@ class UserUseCase{
             console.log('delete comment error in userUserCase',error);
         }
     }
-    async updateRating(RatingData:{postId:string|undefined,rating:number|undefined},userId:string|undefined){
+    async updateRating(RatingData:{roomId:string|undefined,rating:number|undefined,ratingComment:string},userId:string|undefined){
         try {
-            const res = await this.IpostRepository.updateRating(RatingData.postId,RatingData.rating,userId)
+            const res = await this.IpostRepository.updateRating(RatingData.roomId,RatingData.rating,userId,RatingData.ratingComment)
             return res
         } catch (error) {
             console.log('delete comment error in userUserCase',error);
@@ -417,20 +430,29 @@ class UserUseCase{
             console.log('isPostLiked error in userUserCase',error);
         }
     }
-    async addRoom(roomData: Rooms) {
+    async add_edit_Room(roomData: Rooms,isEdit:boolean) {
         try {
-           
-            
             const images = roomData.images;
             const cloudinaryImages = await Promise.all(images.map(async img => {
                 return await this.cloudinary.saveToCloudinary(img);
             }));
             roomData.images = cloudinaryImages
-            const res = await this.IRoomRepository.addRoom(roomData);
+            const res = await this.IRoomRepository.addOrEditRoom(roomData,isEdit);
             return res;
         } catch (error) {
             console.log('add room error in userUseCase:', error);
             throw error;
+        }
+    }
+
+    async deleteRoom (roomId:any){
+        try {
+            const res = await this.IRoomRepository.deleteRoom(roomId)
+            
+            return res
+        } catch (error) {
+            console.log('add room error in userUseCase :',error);
+            
         }
     }
     

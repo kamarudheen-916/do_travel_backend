@@ -1,5 +1,6 @@
 import express from "express";
-import { userProfileUpload,propertyUpload } from "../middleware/multer";
+const router = express.Router() 
+
 import UserAuth from "../middleware/userAuth";
 import UserController from "../../controller/userController";
 import UserUseCase from "../../useCase/UserUseCase";
@@ -20,7 +21,6 @@ import FollowRepository from "../repository/followRepository";
 import BookingController from "../../controller/bookingController";
 import BookingUseCase from "../../useCase/bookingUseCase";
 import BookingRepository from "../repository/BookingRepository";
-const router = express.Router() 
 const cloudinary = new Cloudinary()
 const generateOTP = new GenerateOTP()
 const sendEmail = new SendMail()
@@ -32,6 +32,7 @@ const roomRepository = new RoomRepository()
 const followRepository = new FollowRepository()
 const usercase = new UserUseCase(followRepository,userRepository,postRepository,roomRepository,hashPass,Jwt,cloudinary,generateOTP,sendEmail)
 const uController = new UserController(usercase)
+
 const pController = new propertyController(usercase)
 
 
@@ -62,9 +63,10 @@ router.get('/getUserData',UserAuth,(req,res)=>uController.getUserData(req,res))
 router.put('/updateUserData',UserAuth,(req,res)=>uController.updateUserData(req,res))
 
 router.post('/postComment',UserAuth,(req,res)=>uController.postComment(req,res))
+router.post('/reportPost',UserAuth,(req,res)=>uController.reportPost(req,res))
 router.delete('/deleteComment',UserAuth,(req,res)=>uController.deleteComment(req,res))
 router.put('/editComment',UserAuth,(req,res)=>uController.editComment(req,res))
-router.put('/updateRating',UserAuth,(req,res)=>uController.updateRating(req,res))
+router.put('/updateRoomRating',UserAuth,(req,res)=>uController.updateRating(req,res))
 router.put('/saveOrUnSavePost',UserAuth,(req,res)=>uController.saveOrUnSavePost(req,res))
 router.get('/isPostSaved',UserAuth,(req,res)=>uController.isPostSaved(req,res))
 router.put('/likeOrUnLikePost',UserAuth,(req,res)=>uController.likeOrUnLikePost(req,res))
@@ -80,8 +82,10 @@ router.delete('/deletePost',UserAuth,(req,res)=>uController.deletePost(req,res))
 router.put('/uploadImg',UserAuth,(req,res)=>uController.uploadImg(req,res))
 router.post('/propertyCreate',PropertyAuth,(req,res)=>pController.propertyCreate(req,res))
 router.post('/addRoom',PropertyAuth,(req,res)=>pController.addRoom(req,res))
+router.put('/editRoom',PropertyAuth,(req,res)=>pController.editRoom(req,res))
 router.get('/fetchRoomData',PropertyAuth,(req,res)=>pController.fetchRoomData(req,res))
 router.get('/fetchOtherProfileRoomData',UserAuth,(req,res)=>pController.fetchOtherProfileRoomData(req,res))
+router.delete('/deleteRoom',UserAuth,(req,res)=>pController.deleteRoom(req,res))
 
 router.get('/userSearch',UserAuth,(req,res)=>uController.userSearch(req,res))
 
@@ -100,8 +104,12 @@ router.get('/getThemeMode',UserAuth,(req,res)=>uController.getThemeMode(req,res)
 
 
 router.post('/confirmBooking',UserAuth,(req,res)=>bookingController.confirmBooking(req,res))
+router.post('/onlinePayment',UserAuth,(req,res)=>bookingController.onlinePayment(req,res))
 router.get('/fetchAllBookings',UserAuth,(req,res)=>bookingController.fetchAllBookings(req,res))
 router.put('/cancelBookings',UserAuth,(req,res)=>bookingController.cancelBookings(req,res))
 
+router.get("/getMessage/:id", UserAuth,uController.getMessages);
+router.post('/sendMessage/:id',UserAuth,(req,res)=>uController.sendMessage(req,res))
+router.get("/getUsersSideBar", UserAuth, uController.getUsersForSidebar);
 
 export default router  

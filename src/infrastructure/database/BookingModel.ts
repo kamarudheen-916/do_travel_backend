@@ -28,7 +28,9 @@ const bookingSchema = new Schema<bookingData>({
     isBeforePayment:{type:Boolean},
     paymentIsOnline:{type:Boolean},
     bookingStatus:{type:String},
-    location:{type:String}
+    location:{type:String},
+    createdAt: {type: Date,default: Date.now}
+    
 })
 
 const bookingModel = mongoose.model<bookingData>('BookingData',bookingSchema)

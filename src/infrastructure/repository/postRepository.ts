@@ -4,6 +4,9 @@ import { propertyPostModel } from "../database/propertyPostModel";
 import { PostModel } from "../database/PostModel";
 import savePostModel from "../database/savePostModel";
 import { UserModel } from "../database/userModel";
+import RoomModel from "../database/propertyRoom";
+import { PostReport } from "../../domain_entities/PostReport";
+import PostReportModel from "../database/PostReportModel";
 
 class PostRepository implements IPostRepositry  {
     async addComment(comment: string, postId: string, userId: string,userType:string|undefined): Promise<any> {
@@ -65,27 +68,33 @@ class PostRepository implements IPostRepositry  {
         }
     }
    
-   async updateRating(postId:any, rating: any, userId:any): Promise<any> {
+   async updateRating(roomId:any, rating: any, userId:any,ratingCommnent:string): Promise<any> {
         try {
+            console.log('comment :',ratingCommnent);
+            
             const data = {
                 raterId:userId,
                 rate:rating,
-                ratedDate:new Date()
+                ratedDate:new Date(),
+                comments:ratingCommnent !== '' ? ratingCommnent : ''
             }
-            const doc = await PostModel.findOne({_id:postId})
+            const doc = await RoomModel.findOne({_id:roomId})
             
 
             if(doc){
                 const isAlreadyRated =  doc.ratings.find((item) =>item.raterId === userId)
                 if (isAlreadyRated) {
                     isAlreadyRated.rate = rating;
+                    isAlreadyRated.ratedDate =new Date();
+                    isAlreadyRated.comments = ratingCommnent
+
                 } else {
                     doc.ratings.push(data);
                 }
                 await doc.save();
                 return { success: true, message: 'Rating updated successfully' };
             }else{
-                const res = await PostModel.updateOne({_id:postId},{$push:{
+                const res = await RoomModel.updateOne({_id:roomId},{$push:{
                     ratings:data
                 }})
                 if(res.modifiedCount > 0){
@@ -251,6 +260,15 @@ class PostRepository implements IPostRepositry  {
         } catch (error) {
             console.log('deletePost error in post repository :',error);
             return {success:false,message:'cannot delete the post '}
+        }
+    }
+    async  reportPost(data: PostReport): Promise<any> {
+        try {
+            const res = await PostReportModel.insertMany([data])
+            return res
+        } catch (error) {
+            console.log('report post error : ',error);
+            
         }
     }
 }

@@ -202,7 +202,7 @@ async getAllFollwers(userId: string | undefined): Promise<followSchemaInterface 
 
       const Res = await followModel.findOne({ userId });
       
-      return Res !== null ? Res : [];
+      return Res !== null ? Res : {};
   } catch (error) {
       console.error("Error getAllFollwers:", error);
       return null;

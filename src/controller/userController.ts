@@ -1,5 +1,12 @@
 import { Request,Response } from "express";
 import UserUseCase from "../useCase/UserUseCase";
+import { PostReport } from "../domain_entities/PostReport";
+import ConversationModel from "../infrastructure/database/ConversationModel2";
+import MessageModel from "../infrastructure/database/MessageModel2";
+import { UserModel } from "../infrastructure/database/userModel";
+import { getReceiverSocketId, io } from "../infrastructure/utils/socketIo";
+import PropertyModel from "../infrastructure/database/propertyModel";
+
  
 class UserController {
     constructor ( private readonly userCase : UserUseCase ){}
@@ -179,6 +186,20 @@ class UserController {
             
         }
     }
+    async reportPost(req:Request,res:Response){
+        try {
+            console.log(req.body);
+            const data = req.body
+            data.reporterId = req.userId
+            data.status = 'reported'
+            data.reporterType = req.userType
+            const Response = await this.userCase.reportPost(data)
+            res.json(Response)
+        } catch (error) {
+            console.log('postComment error in userController :',error);
+            
+        }
+    }
     async deleteComment(req:Request,res:Response){
         try {
              const postData = req.body
@@ -328,6 +349,95 @@ class UserController {
             
         }
     }
+
+    async sendMessage (req:Request,res:Response){
+        try {
+            const message = req.body.message
+            const senderId = req.userId
+            const receiverId = req.params.id
+            console.log('id===>',receiverId);
+            
+            let conversation = await ConversationModel.findOne({
+                participants: { $all: [senderId, receiverId] }
+              });
+
+              if (!conversation) {
+                conversation = await ConversationModel.create({
+                    participants: [senderId, receiverId]
+                });
+                }
+
+                            const newMessage = new MessageModel({
+                        senderId,
+                        receiverId,
+                        message
+                        });
+
+              if (newMessage) {
+                conversation.messages.push(newMessage._id);
+                }
+
+
+                await Promise.all([conversation.save(), newMessage.save()]);
+
+                const receiverSocketId = getReceiverSocketId(receiverId)
+                if(receiverSocketId){
+                    // io.to(<socket_Id>).emit() is used to send events to specific clients
+                    io.to(receiverSocketId).emit('newMessage',newMessage)
+                }
+                res.status(201).json(newMessage);
+        } catch (error) {
+            console.log("Error in sentMessages controller: ", error);
+		res.status(500).json({ error: "Internal server error" });
+            
+        }
+    }
+
+    async getMessages (req:Request,res:Response){
+        try {
+            
+            const { id: userToChatId } = req.params;
+		    const senderId = req.userId;
+           
+            if(senderId && userToChatId){
+                console.log('chat id :',userToChatId);
+                console.log('chat id :',senderId);
+            let conversation = await ConversationModel.findOne({
+                participants: { $all: [senderId, userToChatId] },
+            }).populate("messages");
+
+           
+
+            if (!conversation) return res.status(200).json([]);
+
+            const messages = conversation.messages;
+            console.log('rest as;l====>',messages);
+            res.status(200).json(messages);
+            }
+
+            
+        } catch (error) {
+            console.log("Error in getMessages controller: ", error);
+            res.status(500).json({ error: "Internal server error" });
+            
+        }
+    }
+
+    async getUsersForSidebar (req:Request,res:Response){
+        try {
+            const loggedInUserId = req.userId;
+    
+            
+          const  users = await UserModel.find({ _id: { $ne: loggedInUserId } })
+          const  properties = await PropertyModel.find({_id:{$ne:loggedInUserId}})
+          const filteredUsers = [...users,...properties]
+            res.status(200).json(filteredUsers);
+        } catch (error) {
+            console.error("Error in getUsersForSidebar: ", error);
+            res.status(500).json({ error: "Internal server error" });
+        }
+    }
+
 }
 
 

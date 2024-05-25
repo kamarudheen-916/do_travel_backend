@@ -1,14 +1,22 @@
+
+export interface ratingData{
+    raterId:string,
+    rate:number,
+    _id?:string,
+    ratedDate:Date, 
+    comments:string,
+}
 export interface Rooms{
     _id?:string,
     propertyId:string,
     roomName:string,
     typeOfRoom:string,
-    rating:Number,
+    ratings:[ratingData],
     location:string,
     facilities:string[],
     revews:string[],
     price:number,
-    numOfnights:number,
+    numOfNights:number,
     numOfAdults:number,
     numOfRoomLeft:number;
     freeCancellation:boolean,

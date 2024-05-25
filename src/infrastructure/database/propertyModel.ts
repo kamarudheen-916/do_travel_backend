@@ -30,7 +30,7 @@ const PropertySchema : Schema<Property> = new Schema({
        
     },
     Speciality:{
-        type:[String],
+        type:[String], 
        
     },
     MobileNumber:{
@@ -51,6 +51,10 @@ const PropertySchema : Schema<Property> = new Schema({
     OTP :{
         type:String,
         
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
 

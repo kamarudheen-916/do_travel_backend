@@ -11,6 +11,7 @@ export interface ratingData{
     rate:number,
     _id?:string,
     ratedDate:Date, 
+    comments:string,
 }
 
 
@@ -28,5 +29,6 @@ export interface UserPost {
     ratings:[ratingData],
     PostProfile:string,
     PostName:string,
+    // postStatus:string,
 }
 

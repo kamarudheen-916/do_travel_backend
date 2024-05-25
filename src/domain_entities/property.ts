@@ -3,7 +3,7 @@ interface Property {
             PropertyName: string,
             email: string,
             password: string,
-            isBlocked:false,
+            isBlocked:boolean,
             startedDate: Date,
             Address:string,
             TypeOfStay:string[],
@@ -13,5 +13,6 @@ interface Property {
             PropertyProfile: string,
             IsVerified:boolean,
             OTP:string,
+            createdAt:Date
 }
 export default Property

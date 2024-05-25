@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import bookingUseCase from "../useCase/bookingUseCase";
 import { bookingData } from "../domain_entities/BookingData";
+import { Rooms } from "../domain_entities/propertyRoom";
 
 class BookingController {
     constructor (private readonly bUseCase:bookingUseCase){}
@@ -10,7 +11,18 @@ class BookingController {
             const bookingData :bookingData = req.body.bookingData
             bookingData.bookingUserId = req.userId ? req.userId : ''
             bookingData.bookingStatus = 'confirmed'
-            const RES = await this.bUseCase.confirmBooking(bookingData)
+            const responce = await this.bUseCase.confirmBooking(bookingData)
+            res.json(responce)
+        } catch (error) {
+            console.log('confirm booking error in booking controller :',error);
+            
+        }
+    }
+    async onlinePayment (req:Request,res:Response){
+        try {
+            const bookingData :bookingData = req.body.bookingData
+            const roomPrice = req.body.roomPrice
+            const RES = await this.bUseCase.onlinePayment(bookingData,roomPrice)
             res.json(RES)
         } catch (error) {
             console.log('confirm booking error in booking controller :',error);
@@ -21,9 +33,9 @@ class BookingController {
     async fetchAllBookings (req:Request,res:Response){
         try {
             const UserId = req.userId    
-            const RES = await this.bUseCase.fetchAllBookings(UserId)
+            const responce = await this.bUseCase.fetchAllBookings(UserId)
             
-            res.json(RES)
+            res.json(responce)
         } catch (error) {
             console.log('confirm booking error in booking controller :',error);
             

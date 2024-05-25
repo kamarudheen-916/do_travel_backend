@@ -35,7 +35,7 @@ class FollowController{
         }
     }
     async isFollwerRequest (req:Request,res:Response){
-        try {
+        try { 
             const data = req.query
             const Response =  await this.fUseCase.isFollwerRequest(data)
             res.json(Response)

@@ -1,4 +1,5 @@
 import { bookingData } from "../domain_entities/BookingData";
+import { Rooms } from "../domain_entities/propertyRoom";
 import IBookingRepository from "./interface/IBookingRepository";
 
 class BookingUseCase {
@@ -6,6 +7,15 @@ class BookingUseCase {
     async  confirmBooking (BookingData : bookingData){
         try {
             const res = await this.iBookingRepository.uploadBookingData(BookingData)
+            return res
+        } catch (error) {
+            console.log('confirm booking error in booking usecase : ',error);
+            
+        }
+    }
+    async  onlinePayment (bookingData : bookingData,roomPrice:any){
+        try {
+            const res = await this.iBookingRepository.onlinePayment(bookingData,roomPrice)
             return res
         } catch (error) {
             console.log('confirm booking error in booking usecase : ',error);

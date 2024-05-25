@@ -18,8 +18,44 @@ class propertyController {
             const roomData = req.body
             const userId = req.userId
             roomData.propertyId = userId
-            const Res = await this.usercase.addRoom(roomData)
+            const isEdit = false
+            const Res = await this.usercase.add_edit_Room(roomData,isEdit)
             res.json(Res)
+        } catch (error) {
+            
+        }
+    }
+    async editRoom (req:Request,res:Response){
+        try {
+            const roomData = req.body
+            const userId = req.userId
+            roomData.propertyId = userId
+            const isEdit = true
+            const Res = await this.usercase.add_edit_Room(roomData,isEdit)
+            res.json(Res)
+        } catch (error) {
+            
+        }
+    }
+    async deleteRoom (req:Request,res:Response){
+        try {
+            const roomId = req.query.roomId
+            const propertyId = req.userId
+
+            const Res = await this.usercase.deleteRoom(roomId)
+            if(Res.deletedCount > 0){
+                const rooms = await this.usercase.fetchRoomData(propertyId)
+                if(rooms){
+                    console.log('rooms :',rooms);
+                    
+                    res.json( { success: true, message: 'Room Deleted successfully..!' ,rooms})
+                }else{
+                    res.json( { success: true, message: 'Room Deleted successfully..!' })
+                }
+              
+              }else{
+                res.json ({ success: false, message: 'Room deleting failed..!' })
+              }
         } catch (error) {
             
         }

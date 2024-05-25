@@ -4,8 +4,8 @@ export interface bookingData {
     roomId:string
     roomName:string
     roomType:string
-    propertyName:string
-    propertyProfile:string
+    propertyName:string|undefined
+    propertyProfile:string|undefined
     propertyId:string
     bookingUserId:string
     First_Name:string
@@ -28,4 +28,5 @@ export interface bookingData {
     paymentIsOnline:boolean
     bookingStatus:string
     location:string
+    createdAt:Date
 }

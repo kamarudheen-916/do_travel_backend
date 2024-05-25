@@ -37,7 +37,7 @@ class UserRepository implements IuserRepository{
             $set:{
               OTP:'****'
             }})
-        }, 30000);
+        }, 90000);
         
         return result
       } catch (error) {
@@ -62,22 +62,13 @@ class UserRepository implements IuserRepository{
           
       }
     }
-    // async insertPropertyPost(data:{fileUrl:string,textarea:string,userId:string|null,userType:string|null}){
-    //   try {
-    //     const post = data.fileUrl
-    //     const description = data.textarea
-    //     const userId = data.userId
-    //     const Response = await propertyPostModel.insertMany({post,description,userId})
-    //     return Response
-    //   } catch (error) {
-    //     console.log('insertPropertyPost error in userRepository',error);
-    //     return null
-    //   }
-    // }
+
 
     async findPostByUserId(userId:string|undefined,userType:string|undefined){
       try {       
+        
         const allPost = await PostModel.find({userId})
+
         return allPost
       } catch (error) {
         console.log('findPostByUserIdError in user Repositoty:',error);
