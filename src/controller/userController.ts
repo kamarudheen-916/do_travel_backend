@@ -55,6 +55,18 @@ class UserController {
             
         }
     }
+    async checkIsBlocked(req:Request,res:Response){
+        try {
+            //this function is doing nothing here, it is used to check the user is blocked or not 
+            // that checking is happening the the user auth middle ware form the user router page
+            console.log('test is biloked ...');
+             
+            return 
+        } catch (error) {
+            console.log('loginPost error ',error);
+            
+        }
+    }
     async forgottenPass(req:Request,res:Response){
         try {
             const {forgetFormData,userType} = req.body

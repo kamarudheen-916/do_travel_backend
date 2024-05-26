@@ -18,7 +18,7 @@ class BookingRepository implements IBookingRepository {
             if(roomData){
                 console.log('room data :',roomData);
                 
-                roomData.numOfRoomLeft =  roomData.numOfRoomLeft -1
+                roomData.numOfRoomLeft =  roomData.numOfRoomLeft - BookingData.numberOfRoom
                 roomData.save()
             }
             if(res)

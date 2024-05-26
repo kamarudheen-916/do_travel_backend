@@ -21,6 +21,7 @@ import FollowRepository from "../repository/followRepository";
 import BookingController from "../../controller/bookingController";
 import BookingUseCase from "../../useCase/bookingUseCase";
 import BookingRepository from "../repository/BookingRepository";
+import { checkRoomCount } from "../middleware/checkRoomCount";
 const cloudinary = new Cloudinary()
 const generateOTP = new GenerateOTP()
 const sendEmail = new SendMail()
@@ -51,6 +52,7 @@ router.post('/login',(req,res)=>uController.loginUser(req,res))
 router.post('/forgottenPassword',(req,res)=>uController.forgottenPass(req,res))
 router.post('/verifyForgetOTP',(req,res)=>uController.verifyForgottenOTP(req,res))
 router.post('/ResendOtp/:userType/:email', (req, res) => uController.resendOTP(req, res));
+router.get('/checkIsBlocked',UserAuth,(req,res)=>uController.checkIsBlocked(req,res))
 router.post('/userCreate',UserAuth,(req,res)=>uController.userCreate(req,res))
 router.get('/getAllFeeds',UserAuth,(req,res)=>uController.getAllFeeds(req,res))
 router.get('/getAllPosts',UserAuth,(req,res)=>uController.getAllPosts(req,res))
@@ -103,8 +105,8 @@ router.put('/setThemeMode',UserAuth,(req,res)=>uController.setThemeMode(req,res)
 router.get('/getThemeMode',UserAuth,(req,res)=>uController.getThemeMode(req,res))
 
 
-router.post('/confirmBooking',UserAuth,(req,res)=>bookingController.confirmBooking(req,res))
-router.post('/onlinePayment',UserAuth,(req,res)=>bookingController.onlinePayment(req,res))
+router.post('/confirmBooking',checkRoomCount,UserAuth,(req,res)=>bookingController.confirmBooking(req,res))
+router.post('/onlinePayment',checkRoomCount,UserAuth,(req,res)=>bookingController.onlinePayment(req,res))
 router.get('/fetchAllBookings',UserAuth,(req,res)=>bookingController.fetchAllBookings(req,res))
 router.put('/cancelBookings',UserAuth,(req,res)=>bookingController.cancelBookings(req,res))
 
