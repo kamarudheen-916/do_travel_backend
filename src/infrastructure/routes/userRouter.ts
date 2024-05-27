@@ -65,6 +65,8 @@ router.get('/getUserData',UserAuth,(req,res)=>uController.getUserData(req,res))
 router.put('/updateUserData',UserAuth,(req,res)=>uController.updateUserData(req,res))
 
 router.post('/postComment',UserAuth,(req,res)=>uController.postComment(req,res))
+router.post('/postReplayComment',UserAuth,(req,res)=>uController.postReplayComment(req,res))
+router.get('/fetchReplayComment',UserAuth,(req,res)=>uController.fetchReplayComment(req,res))
 router.post('/reportPost',UserAuth,(req,res)=>uController.reportPost(req,res))
 router.delete('/deleteComment',UserAuth,(req,res)=>uController.deleteComment(req,res))
 router.put('/editComment',UserAuth,(req,res)=>uController.editComment(req,res))

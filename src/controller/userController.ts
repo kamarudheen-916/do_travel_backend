@@ -198,6 +198,29 @@ class UserController {
             
         }
     }
+    async postReplayComment(req:Request,res:Response){
+        try {
+      
+            const {postId,replayCommentId,replayComment} = req.body
+            const Response = await this.userCase.postReplayComment(postId,replayCommentId,replayComment,req.userId,req.userType)
+            res.json(Response)
+        } catch (error) {
+            console.log('postComment error in userController :',error);
+            
+        }
+    }
+
+    async fetchReplayComment(req:Request,res:Response){
+        try {
+      
+            const {commentId} = req.query
+            const Response = await this.userCase.fetchReplayComment(commentId)
+            res.json(Response)
+        } catch (error) {
+            console.log('postComment error in userController :',error);
+            
+        }
+    }
     async reportPost(req:Request,res:Response){
         try {
             console.log(req.body);

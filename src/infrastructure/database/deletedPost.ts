@@ -23,7 +23,7 @@ const DeletedPostSchema:Schema<UserPost>  = new Schema({
     location:{type:String},
     date:{type:Date,default:Date.now},
     like:{type:[String]},
-    comments:{type:[commentSchema]},
+    comments:{type:[String]},
     ratings:{type:[ratingSchema]},
     isProperty:{type:Boolean},
     PostProfile:{type:String},

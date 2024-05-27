@@ -1,9 +1,13 @@
  export interface comments {
+    parantId:string,
     comment:string,
     commentedId:string,
     comment_likes:number,
     _id?:string,
-    commentTime:Date
+    commentTime:Date,
+    replayComments:[string]
+    comenterName:string;
+    comenterProfile:string;
 
 }
 export interface ratingData{
@@ -25,7 +29,7 @@ export interface UserPost {
     location:string,
     date:Date,
     like:[string],
-    comments:comments[],
+    comments:[string],
     ratings:[ratingData],
     PostProfile:string,
     PostName:string,

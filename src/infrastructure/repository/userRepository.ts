@@ -67,7 +67,7 @@ class UserRepository implements IuserRepository{
     async findPostByUserId(userId:string|undefined,userType:string|undefined){
       try {       
         
-        const allPost = await PostModel.find({userId})
+        const allPost = await PostModel.find({userId}).populate('comments')
 
         return allPost
       } catch (error) {

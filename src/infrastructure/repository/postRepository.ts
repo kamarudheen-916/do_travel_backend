@@ -7,42 +7,104 @@ import { UserModel } from "../database/userModel";
 import RoomModel from "../database/propertyRoom";
 import { PostReport } from "../../domain_entities/PostReport";
 import PostReportModel from "../database/PostReportModel";
+import { commnetModel } from "../database/PostComments";
+import { replayCommentModel } from "../database/RepalyComment";
 
 class PostRepository implements IPostRepositry  {
     async addComment(comment: string, postId: string, userId: string,userType:string|undefined): Promise<any> {
         try {
-            const updatedPost = await PostModel.findByIdAndUpdate(
-                { _id: postId },
-                {
-                    $push: {
-                        comments: {
-                            comment: comment,
-                            commentedId: userId, 
-                        }
-                    }
-                },
-                { new: true } // Option to return the updated document
-            );
-            return updatedPost;
-           
+            let user:any
+          if(userType === 'user'){
+            user = await UserModel.findById(userId)
+          }else{
+            user = await PropertyModel.findById(userId)
+          }
+          const data :any ={
+                parantId:postId,
+                comment:comment,
+                commentedId:userId,
+                comenterName:user.firstName||user.PropertyName,
+                comenterProfile:user.Profile||user.PropertyProfile
+            }
+            const newComment = await commnetModel.create(data);
+            if(newComment){
+                const post = await PostModel.findByIdAndUpdate({_id:postId},{
+                    $push:{comments:newComment._id}
+                },{new:true}).populate('comments')
+                console.log(post);
+                
+                return post;
+            }else {
+                return null
+            }
+
         } catch (error) {
             console.log('addComment error in postRepository:', error);
             throw error; // Rethrow the error for handling in the upper layers
         }
     }
-    
+
+    async postReplayComment(postId: string, replayCommentId: string, replayComment: string, userId: string, userType: string): Promise<any> {
+        try {
+            let user:any
+            if(userType === 'user'){
+              user = await UserModel.findById(userId)
+            }else{
+              user = await PropertyModel.findById(userId)
+            }
+            const data ={
+                parantId:replayCommentId,
+                comment:replayComment,
+                commentedId:userId,
+                comenterName:user.firstName||user.PropertyName,
+                comenterProfile:user.Profile||user.PropertyProfile
+            }
+            const newReplayComment = await replayCommentModel.create(data)
+
+            if(newReplayComment){
+                const comment = await commnetModel.findByIdAndUpdate({_id:replayCommentId},{
+                    $push:{replayComments:newReplayComment._id}
+                },{new:true}).populate('replayComments')
+                console.log('comment*****> :',comment);
+                
+                if(comment) {
+                    return comment;
+                }else{
+                    return 
+                }
+
+            }else {
+                return null
+            }
+        } catch (error) {
+            console.log('postReplayComment error in postRepository:', error);
+            throw error;
+        }
+    }
+   async fetchReplayComment(commentId: string): Promise<any> {
+        try {
+            const comment = await commnetModel.findById(commentId).populate('replayComments')
+            if(comment)
+            {
+                console.log('comment :',comment);
+                
+                return comment
+            }else{
+                return null
+            }
+        } catch (error) {
+            console.log('fetchReplayComment error in postRepository:', error);
+            throw error;
+        }
+    }
     async deleteComment(postId: string, commentId: string, index: number,userType:string|undefined) {
         try {
-            const post = await PostModel.findById(postId)
+            const comment = await commnetModel.deleteOne({_id:commentId})
 
-            if (!post) {
-                return { success: false, message: "Post not found" };
+            if (!comment) {
+                return { success: false, message: "comment not found" };
             }
-            if (index < 0 || index >= post.comments.length) {
-                return { success: false, message: "Invalid comment index" };
-            }
-            post.comments.splice(index, 1);
-            await post.save();
+            const post = await PostModel.findById(postId)
             return { success: true, message: "Comment deleted successfully",post };
         } catch (error) {
             console.log('delete comment error:', error);
@@ -53,13 +115,15 @@ class PostRepository implements IPostRepositry  {
     async  editComment(postId: string | undefined, commentId: string | undefined, editedComment: string,userType:string|undefined): Promise<any> {
         try {
            
-                const post = await PostModel.findById(postId)
-                if (!post) {
+                const comment = await commnetModel.findById(commentId)
+                if (!comment) {
                     return { success: false, message: "Post not found" };
                 }
-                const commentIndex = post.comments.findIndex(comment => comment && comment._id && comment._id.toString() === commentId);
-                post.comments[commentIndex].comment = editedComment
-                await post.save()
+              
+                comment.comment = editedComment
+                await comment.save()
+                const post = await PostModel.findById(postId)
+
                 return {success:true, message:'Comment updated',post}
             
         } catch (error) {

@@ -4,6 +4,8 @@ import { searchData } from "../../domain_entities/searchData"
 
 export interface IPostRepositry{
     addComment(comment:string,postId:string,userId:string|undefined,userType:string|undefined):Promise<any>
+    postReplayComment(postId:string,replayCommentId:string,replayComment:string,userId:string,userType:string):Promise<any>
+    fetchReplayComment(commentId:string):Promise<any>
     deleteComment(postId:string,commentId:string,index:number,userType:string|undefined):Promise<any>
     editComment(postId:string|undefined,commentId:string|undefined,editedComment:string,userType:string|undefined):Promise<any>
     updateRating(postId:string|undefined,rating:number|undefined,userId:string|undefined,ratingComment:string):Promise<any>

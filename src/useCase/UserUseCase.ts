@@ -342,6 +342,32 @@ class UserUseCase{
             
         }
     }
+    async postReplayComment(postId:string,replayCommentId:string,replayComment:string,userId:any,userType:any){
+        try {
+            const comment = await this.IpostRepository.postReplayComment(postId,replayCommentId,replayComment,userId,userType)
+            if(comment){
+                return {success:true,message:'Comment posted.',replayComments:comment.replayComments}
+            }else{
+                return {sucess:false,message:'oops..! Cannot post you comment..!'}
+            }
+        } catch (error) {
+            console.log('postReplayComment error in userUseCase ',error);
+            
+        }
+    }
+    async fetchReplayComment(commentId:any){
+        try {
+            const replayComments = await this.IpostRepository.fetchReplayComment(commentId)
+            if(replayComments){
+                return {success:true,message:'Comment posted.',replayComments}
+            }else{
+                return {sucess:false,message:'oops..! Cannot get your comment..!'}
+            }
+        } catch (error) {
+            console.log('fetchReplayComment error in userUseCase ',error);
+            
+        }
+    }
     async reportPost(data:any){
         try {
             const res = await this.IpostRepository.reportPost(data)
