@@ -228,7 +228,8 @@ class PostRepository implements IPostRepositry  {
             if(Like_or_unLike === 'like'){
                 const doc = await PostModel.updateOne({_id:postId},{$push:{like:userId}})
                 if(doc.modifiedCount >0){
-                     return {success:true,message:'Liked succesfully..!'}
+                    const post = await PostModel.findById(postId).populate('comments')
+                     return {success:true,message:'Liked succesfully..!',post}
 
                 }else{
                       return {success:false,message:'There is an issue to like this post...!'}
@@ -241,7 +242,9 @@ class PostRepository implements IPostRepositry  {
                     if(index !== -1){
                         doc.like.splice(index,1)
                         await doc.save()
-                        return {success:true,message:'unLiked succesfully..!'}
+                          const post = await PostModel.findById(postId).populate('comments')
+
+                        return {success:true,message:'unLiked succesfully..!',post}
 
                     }else{
                         return {success:false,message:'There is an issue to like this post...**!'}
