@@ -1,5 +1,5 @@
 import mongoose ,{Schema} from "mongoose";
-import { Rooms } from "../../domain_entities/propertyRoom";
+import { Rooms, roomBookinDates } from "../../domain_entities/propertyRoom";
 import { ratingData } from "../../domain_entities/Post";
 
 
@@ -9,7 +9,11 @@ const ratingSchema :Schema<ratingData> = new Schema({
     ratedDate:{type:Date,default : new Date()},
     comments:{type:String,default:''}
 })
-
+const roomBookedDatesSchema:Schema<roomBookinDates> = new Schema({
+    checkInDate : {type:String},
+    checkOutDate : {type:String},
+    bookedRoomCount:{type:Number},
+})
 const RoomSheam :Schema<Rooms> = new Schema({
     propertyId:{type:String},
     roomName:{type:String},
@@ -24,7 +28,8 @@ const RoomSheam :Schema<Rooms> = new Schema({
     numOfRoomLeft:{type:Number},
     freeCancellation:{type:Boolean},
     isBeforePayment:{type:Boolean},
-    images:{type:[String]}
+    images:{type:[String]},
+    bookedDates:{type:[roomBookedDatesSchema]}
 })
 
 const RoomModel = mongoose.model<Rooms>('Rooms',RoomSheam)

@@ -104,7 +104,7 @@ class PostRepository implements IPostRepositry  {
             if (!comment) {
                 return { success: false, message: "comment not found" };
             }
-            const post = await PostModel.findById(postId)
+            const post = await PostModel.findById(postId).populate('comments')
             return { success: true, message: "Comment deleted successfully",post };
         } catch (error) {
             console.log('delete comment error:', error);
@@ -122,7 +122,7 @@ class PostRepository implements IPostRepositry  {
               
                 comment.comment = editedComment
                 await comment.save()
-                const post = await PostModel.findById(postId)
+                const post = await PostModel.findById(postId).populate('comments')
 
                 return {success:true, message:'Comment updated',post}
             

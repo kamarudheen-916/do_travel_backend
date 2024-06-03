@@ -390,37 +390,8 @@ class UserController {
             const message = req.body.message
             const senderId = req.userId
             const receiverId = req.params.id
-            console.log('id===>',receiverId);
-            
-            let conversation = await ConversationModel.findOne({
-                participants: { $all: [senderId, receiverId] }
-              });
-
-              if (!conversation) {
-                conversation = await ConversationModel.create({
-                    participants: [senderId, receiverId]
-                });
-                }
-
-                            const newMessage = new MessageModel({
-                        senderId,
-                        receiverId,
-                        message
-                        });
-
-              if (newMessage) {
-                conversation.messages.push(newMessage._id);
-                }
-
-
-                await Promise.all([conversation.save(), newMessage.save()]);
-
-                const receiverSocketId = getReceiverSocketId(receiverId)
-                if(receiverSocketId){
-                    // io.to(<socket_Id>).emit() is used to send events to specific clients
-                    io.to(receiverSocketId).emit('newMessage',newMessage)
-                }
-                res.status(201).json(newMessage);
+            const resp = await this.userCase.sendMessage(message,senderId,receiverId)
+                res.status(201).json(resp);
         } catch (error) {
             console.log("Error in sentMessages controller: ", error);
 		res.status(500).json({ error: "Internal server error" });
@@ -446,7 +417,7 @@ class UserController {
             if (!conversation) return res.status(200).json([]);
 
             const messages = conversation.messages;
-            console.log('rest as;l====>',messages);
+          
             res.status(200).json(messages);
             }
 
@@ -460,9 +431,7 @@ class UserController {
 
     async getUsersForSidebar (req:Request,res:Response){
         try {
-            const loggedInUserId = req.userId;
-    
-            
+          const loggedInUserId = req.userId;
           const  users = await UserModel.find({ _id: { $ne: loggedInUserId } })
           const  properties = await PropertyModel.find({_id:{$ne:loggedInUserId}})
           const filteredUsers = [...users,...properties]

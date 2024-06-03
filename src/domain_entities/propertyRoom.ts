@@ -6,6 +6,11 @@ export interface ratingData{
     ratedDate:Date, 
     comments:string,
 }
+export interface  roomBookinDates{
+    checkInDate : string,
+    checkOutDate : string,
+    bookedRoomCount:number
+}
 export interface Rooms{
     _id?:string,
     propertyId:string,
@@ -21,5 +26,6 @@ export interface Rooms{
     numOfRoomLeft:number;
     freeCancellation:boolean,
     isBeforePayment:boolean,
-    images:string[]
+    images:string[],
+    bookedDates:[roomBookinDates]
 }

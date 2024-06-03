@@ -4,6 +4,15 @@ import IBookingRepository from "./interface/IBookingRepository";
 
 class BookingUseCase {
     constructor(private readonly iBookingRepository:IBookingRepository){}
+    async  checkRoomAvailability (roomId:any,checkInDate:any,checkOutDate:any){
+        try {
+            const res = await this.iBookingRepository.checkRoomAvailability(roomId,checkInDate,checkOutDate)
+            return res
+        } catch (error) {
+            console.log('confirm booking error in booking usecase : ',error);
+            
+        }
+    }
     async  confirmBooking (BookingData : bookingData){
         try {
             const res = await this.iBookingRepository.uploadBookingData(BookingData)

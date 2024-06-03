@@ -21,7 +21,10 @@ import FollowRepository from "../repository/followRepository";
 import BookingController from "../../controller/bookingController";
 import BookingUseCase from "../../useCase/bookingUseCase";
 import BookingRepository from "../repository/BookingRepository";
-import { checkRoomCount } from "../middleware/checkRoomCount";
+import ChatRepository from "../repository/ChatRepository";
+import ChatUserCase from "../../useCase/ChatUserCase";
+import ChatController from "../../controller/chatController";
+
 const cloudinary = new Cloudinary()
 const generateOTP = new GenerateOTP()
 const sendEmail = new SendMail()
@@ -44,6 +47,10 @@ const bookingRepository = new BookingRepository()
 const bUseCase = new BookingUseCase(bookingRepository)
 const bookingController = new BookingController(bUseCase)
 
+
+const ChatRepo= new ChatRepository()
+const CUserCase = new ChatUserCase(ChatRepo)
+const cController = new ChatController(CUserCase)
 
 router.post('/signup_user',localVariables,(req,res)=>uController.signUpUser(req,res))
 router.post('/signup_property',(req,res)=>uController.signUpProperty(req,res));
@@ -107,13 +114,14 @@ router.put('/setThemeMode',UserAuth,(req,res)=>uController.setThemeMode(req,res)
 router.get('/getThemeMode',UserAuth,(req,res)=>uController.getThemeMode(req,res))
 
 
-router.post('/confirmBooking',checkRoomCount,UserAuth,(req,res)=>bookingController.confirmBooking(req,res))
-router.post('/onlinePayment',checkRoomCount,UserAuth,(req,res)=>bookingController.onlinePayment(req,res))
+router.get('/checkRoomAvailability',UserAuth,(req,res)=>bookingController.checkRoomAvailability(req,res))
+router.post('/confirmBooking',UserAuth,(req,res)=>bookingController.confirmBooking(req,res))
+router.post('/onlinePayment',UserAuth,(req,res)=>bookingController.onlinePayment(req,res))
 router.get('/fetchAllBookings',UserAuth,(req,res)=>bookingController.fetchAllBookings(req,res))
 router.put('/cancelBookings',UserAuth,(req,res)=>bookingController.cancelBookings(req,res))
 
 router.get("/getMessage/:id", UserAuth,uController.getMessages);
-router.post('/sendMessage/:id',UserAuth,(req,res)=>uController.sendMessage(req,res))
+router.post('/sendMessage/:id',UserAuth,(req,res)=>cController.sendMessage(req,res))
 router.get("/getUsersSideBar", UserAuth, uController.getUsersForSidebar);
 
 export default router  

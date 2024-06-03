@@ -11,14 +11,43 @@ if (!stripeSecretKey) {
 const stripe = new Stripe(stripeSecretKey);
 
 class BookingRepository implements IBookingRepository {
+    async checkRoomAvailability(roomId: string, checkInDate: string, checkOutDate: string): Promise<any> {
+        try {
+            const roomData = await RoomModel.findById(roomId);
+            console.log('check room availability :',roomId);
+            
+            if (roomData && roomData.bookedDates.length > 0) {
+                const checkIn = new Date(checkInDate);
+                const checkOut = new Date(checkOutDate);
+    
+                for (const booking of roomData.bookedDates) {
+                    const bookedCheckIn = new Date(booking.checkInDate);
+                    const bookedCheckOut = new Date(booking.checkOutDate);
+    
+                    if ((checkIn >= bookedCheckIn && checkIn < bookedCheckOut) || 
+                        (checkOut > bookedCheckIn && checkOut <= bookedCheckOut) ||
+                        (checkIn <= bookedCheckIn && checkOut >= bookedCheckOut)) {
+                        return { success: false, message: 'Room is not available for the given dates' };
+                    }
+                }
+                
+                return { success: true, message: 'Room is available' };
+            } else {
+                return { success: true, message: 'Room is available' };
+            }
+        } catch (error) {
+            console.log('check room availability error at Booking repository:', error);
+            return { success: false, message: 'An error occurred while checking room availability' };
+        }
+    }
    async uploadBookingData(BookingData: bookingData): Promise<any> {
         try {
             const res = await bookingModel.insertMany([BookingData])
             const roomData = await RoomModel.findOne({_id:BookingData.roomId})
             if(roomData){
                 console.log('room data :',roomData);
-                
-                roomData.numOfRoomLeft =  roomData.numOfRoomLeft - BookingData.numberOfRoom
+                roomData.bookedDates.push({checkInDate:BookingData.checkInDate,checkOutDate:BookingData.checkOutDate,bookedRoomCount:BookingData.numberOfRoom})
+                // roomData.numOfRoomLeft =  roomData.numOfRoomLeft - BookingData.numberOfRoom
                 roomData.save()
             }
             if(res)

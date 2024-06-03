@@ -547,6 +547,38 @@ class UserUseCase{
         throw error;
     }
 }
+async sendMessage(message:any,senderId:any,receiverId:any) {
+    try {
+       const res = await this.iUserRepository.sendMessage(message,senderId,receiverId)
+       return res
+    } catch (error) {
+        console.log('sendMessage error in userUseCase:', error);
+        throw error;
+    }
+}
+
+async getMessages(userToChatId:any,senderId:any){
+    try {
+        const res = await this.iUserRepository.getMessages(userToChatId,senderId)
+        return res
+    } catch (error) {
+        console.log('getMessages error in userUsercase',error);
+        throw error
+        
+    }
+}
+
+async getUsersForSidebar(loggedInUserId:any) {
+    try {
+        console.log('userid ***>',loggedInUserId);
+       const res = await this.iUserRepository.getUsersForSidebar(loggedInUserId)
+       return res
+    } catch (error) {
+        console.log('getMessages error in userUseCase:', error);
+        throw error;
+    }
+}
+
 }
 
 export default UserUseCase

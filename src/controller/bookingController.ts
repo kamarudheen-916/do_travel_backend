@@ -6,6 +6,18 @@ import { Rooms } from "../domain_entities/propertyRoom";
 class BookingController {
     constructor (private readonly bUseCase:bookingUseCase){}
 
+    async checkRoomAvailability (req:Request,res:Response){
+        try {
+            console.log('checkRoomAvailability test  :',req.query);
+            
+            const {roomId,checkInDate,checkOutDate} = req.query
+            const responce = await this.bUseCase.checkRoomAvailability(roomId,checkInDate,checkOutDate)
+            res.json(responce)
+        } catch (error) {
+            console.log('confirm booking error in booking controller :',error);
+            
+        }
+    }
     async confirmBooking (req:Request,res:Response){
         try {
             const bookingData :bookingData = req.body.bookingData
