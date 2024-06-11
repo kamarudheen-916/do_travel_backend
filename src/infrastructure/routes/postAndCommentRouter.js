@@ -1,0 +1,23 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const userAuth_1 = __importDefault(require("../middleware/userAuth"));
+const dependencyController_1 = require("../utils/dependencyController");
+const postCommentRouter = express_1.default.Router();
+postCommentRouter.post('/userCreate', userAuth_1.default, (req, res) => dependencyController_1.uController.userCreate(req, res));
+postCommentRouter.post('/postComment', userAuth_1.default, (req, res) => dependencyController_1.uController.postComment(req, res));
+postCommentRouter.post('/postReplayComment', userAuth_1.default, (req, res) => dependencyController_1.uController.postReplayComment(req, res));
+postCommentRouter.get('/fetchReplayComment', userAuth_1.default, (req, res) => dependencyController_1.uController.fetchReplayComment(req, res));
+postCommentRouter.post('/reportPost', userAuth_1.default, (req, res) => dependencyController_1.uController.reportPost(req, res));
+postCommentRouter.delete('/deleteComment', userAuth_1.default, (req, res) => dependencyController_1.uController.deleteComment(req, res));
+postCommentRouter.put('/editComment', userAuth_1.default, (req, res) => dependencyController_1.uController.editComment(req, res));
+postCommentRouter.put('/saveOrUnSavePost', userAuth_1.default, (req, res) => dependencyController_1.uController.saveOrUnSavePost(req, res));
+postCommentRouter.get('/isPostSaved', userAuth_1.default, (req, res) => dependencyController_1.uController.isPostSaved(req, res));
+postCommentRouter.put('/likeOrUnLikePost', userAuth_1.default, (req, res) => dependencyController_1.uController.likeOrUnLikePost(req, res));
+postCommentRouter.get('/isPostLiked', userAuth_1.default, (req, res) => dependencyController_1.uController.isPostLiked(req, res));
+postCommentRouter.get('/fetchPostLikersData', userAuth_1.default, (req, res) => dependencyController_1.uController.fetchPostLikersData(req, res));
+postCommentRouter.delete('/deletePost', userAuth_1.default, (req, res) => dependencyController_1.uController.deletePost(req, res));
+exports.default = postCommentRouter;

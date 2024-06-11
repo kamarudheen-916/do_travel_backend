@@ -385,62 +385,11 @@ class UserController {
         }
     }
 
-    async sendMessage (req:Request,res:Response){
-        try {
-            const message = req.body.message
-            const senderId = req.userId
-            const receiverId = req.params.id
-            const resp = await this.userCase.sendMessage(message,senderId,receiverId)
-                res.status(201).json(resp);
-        } catch (error) {
-            console.log("Error in sentMessages controller: ", error);
-		res.status(500).json({ error: "Internal server error" });
-            
-        }
-    }
 
-    async getMessages (req:Request,res:Response){
-        try {
-            
-            const { id: userToChatId } = req.params;
-		    const senderId = req.userId;
-           
-            if(senderId && userToChatId){
-                console.log('chat id :',userToChatId);
-                console.log('chat id :',senderId);
-            let conversation = await ConversationModel.findOne({
-                participants: { $all: [senderId, userToChatId] },
-            }).populate("messages");
 
-           
 
-            if (!conversation) return res.status(200).json([]);
 
-            const messages = conversation.messages;
-          
-            res.status(200).json(messages);
-            }
 
-            
-        } catch (error) {
-            console.log("Error in getMessages controller: ", error);
-            res.status(500).json({ error: "Internal server error" });
-            
-        }
-    }
-
-    async getUsersForSidebar (req:Request,res:Response){
-        try {
-          const loggedInUserId = req.userId;
-          const  users = await UserModel.find({ _id: { $ne: loggedInUserId } })
-          const  properties = await PropertyModel.find({_id:{$ne:loggedInUserId}})
-          const filteredUsers = [...users,...properties]
-            res.status(200).json(filteredUsers);
-        } catch (error) {
-            console.error("Error in getUsersForSidebar: ", error);
-            res.status(500).json({ error: "Internal server error" });
-        }
-    }
 
 }
 

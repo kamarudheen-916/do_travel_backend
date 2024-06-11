@@ -1,7 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import userRouter from '../routes/userRouter';
+import homeRouter from '../routes/userRouter';
+import bookingRouter from '../routes/bookingRoute';
+import chatRouter from '../routes/chatRouter';
+import followUnfollowRouter from '../routes/followAndUnfollwoRoute';
+import postCommentRouter from '../routes/postAndCommentRouter';
+import porfileAndRoomRouter from '../routes/profileAndRoomRoute';
+import userAuthRouter from '../routes/userAuthRouter';
 import path from 'path';
 import adminRouter from '../routes/adminRouter';
 import http from 'http';
@@ -23,7 +29,13 @@ export const createServer = () => {
         credentials: true,
       })
     );
-    app.use('/api/user/', userRouter);
+    app.use('/api/user/', userAuthRouter);
+    app.use('/api/user/', homeRouter);
+    app.use('/api/user/', bookingRouter);
+    app.use('/api/user/', chatRouter);
+    app.use('/api/user/', followUnfollowRouter);
+    app.use('/api/user/', postCommentRouter);
+    app.use('/api/user/', porfileAndRoomRouter);
     app.use('/api/admin/', adminRouter);
 
     const httpServer = http.createServer(app);

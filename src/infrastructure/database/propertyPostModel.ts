@@ -21,8 +21,8 @@ const propertyPostSchema:Schema<UserPost>  = new Schema({
     description:{type:String},
     location:{type:String},
     date:{type:Date,default:Date.now},
-    like:{type:Number,default:0},
-    comments:{type:[commentSchema]},
+    like:{type:[String]},
+    comments:{type:[String],ref:'comments'},
     ratings:{type:[ratingSchema]},
 
 })

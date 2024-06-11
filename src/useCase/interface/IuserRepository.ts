@@ -16,9 +16,7 @@ interface IuserRepository {
     userSearch (searchData:string,userId:string|undefined,userType:string|undefined):Promise<User[]>
     setThemeMode(mode:string|undefined,userId:string|undefined):Promise<any>
     getThemeMode(userId:string|undefined):Promise<any>
-    sendMessage(message:string,senderId:string,receiverId:string):Promise<any>
-    getMessages(userToChatId:string,senderId:string):Promise<any>
-    getUsersForSidebar(loggedInUserId:string):Promise<any>
+
     propertySearch (searchData:string,userId:string|undefined,userType:string|undefined):Promise<Property[]>
 
 }
