@@ -22,7 +22,7 @@ const startServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield (0, connectDB_1.connectDB)();
         const httpServer = (0, app_1.createServer)();
-        const PORT = process.env.PORT || 3000;
+        const PORT = process.env.PORT || 4000;
         socketIo_1.server.listen(PORT, () => {
             console.log(`server runs on port: ${PORT}`);
         });

@@ -30,6 +30,9 @@ const createServer = () => {
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
             credentials: true,
         }));
+        socketIo_1.app.get('/', (req, res) => {
+            res.json('done');
+        });
         socketIo_1.app.use('/api/user/', userAuthRouter_1.default);
         socketIo_1.app.use('/api/user/', userRouter_1.default);
         socketIo_1.app.use('/api/user/', bookingRoute_1.default);
