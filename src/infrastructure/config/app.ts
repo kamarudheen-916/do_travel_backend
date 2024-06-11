@@ -29,6 +29,9 @@ export const createServer = () => {
         credentials: true,
       })
     );
+    app.get('/',(req,res)=>{
+  res.json('done')
+    })
     app.use('/api/user/', userAuthRouter);
     app.use('/api/user/', homeRouter);
     app.use('/api/user/', bookingRouter);
