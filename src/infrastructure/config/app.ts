@@ -24,7 +24,7 @@ export const createServer = () => {
     app.use(express.static(path.join(parentDirectory + '/public')));
     app.use(
       cors({
-        origin: 'http://localhost:5173',
+        origin: 'https://do-travel-frontend-z91y.vercel.app',
         methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
         credentials: true,
       })

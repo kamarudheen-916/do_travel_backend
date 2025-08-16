@@ -26,7 +26,7 @@ const createServer = () => {
         const parentDirectory = path_1.default.resolve(__dirname, '../../..');
         socketIo_1.app.use(express_1.default.static(path_1.default.join(parentDirectory + '/public')));
         socketIo_1.app.use((0, cors_1.default)({
-            origin: 'http://localhost:5173',
+            origin: 'https://do-travel-frontend-z91y.vercel.app',
             methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
             credentials: true,
         }));
