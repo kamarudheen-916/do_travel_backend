@@ -1,0 +1,370 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class UserController {
+    constructor(userCase) {
+        this.userCase = userCase;
+    }
+    async signUpUser(req, res) {
+        try {
+            let { FormData, userType } = req.body;
+            const Response = await this.userCase.userSignUp(FormData, userType);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('signup error : ', error);
+        }
+    }
+    async verifyOTP(req, res) {
+        try {
+            const userId = req.params.userId;
+            const OTPData = req.body;
+            const verifyOtp = await this.userCase.verifyOTP(OTPData.OTP, OTPData.userId, OTPData.userType);
+            res.json(verifyOtp);
+        }
+        catch (error) {
+            console.log('verifyOTP error in userController');
+        }
+    }
+    async signUpProperty(req, res) {
+        try {
+            let { FormData, userType } = req.body;
+            const property = await this.userCase.PropertySignUP(FormData, userType);
+            res.json(property);
+        }
+        catch (error) {
+            console.log('signup error : ', error);
+        }
+    }
+    async loginUser(req, res) {
+        try {
+            const { formData, userType } = req.body;
+            const { email, password } = formData;
+            const user = await this.userCase.userLogin({ email, password, userType });
+            return res.json(user);
+        }
+        catch (error) {
+            console.log('loginPost error ', error);
+        }
+    }
+    async checkIsBlocked(req, res) {
+        try {
+            //this function is doing nothing here, it is used to check the user is blocked or not 
+            // that checking is happening the the user auth middle ware form the user router page
+            console.log('test is biloked ...');
+            return;
+        }
+        catch (error) {
+            console.log('loginPost error ', error);
+        }
+    }
+    async forgottenPass(req, res) {
+        try {
+            const { forgetFormData, userType } = req.body;
+            const { email, password, confirmPassword } = forgetFormData;
+            const newPass = await this.userCase.forgottenPassword(email, password, confirmPassword, userType);
+            return res.json(newPass);
+        }
+        catch (error) {
+            console.log('forgotten password error :', error);
+        }
+    }
+    async verifyForgottenOTP(req, res) {
+        try {
+            const data = req.body;
+            const IsVerified = await this.userCase.verifyForgottenOTP(data);
+            return res.json(IsVerified);
+        }
+        catch (error) {
+            console.log('verifyForgottenOTP error :', error);
+        }
+    }
+    async resendOTP(req, res) {
+        try {
+            const { userType, email } = req.params;
+            if (userType === undefined) {
+                res.json({ success: false, message: 'Please try again..!' });
+            }
+            else {
+                const isRsendOTP = await this.userCase.ResendOTP(userType, email);
+                if (isRsendOTP) {
+                    res.json({ success: true, message: 'Resend OTP successful' });
+                }
+                else {
+                    res.json({ sucess: false, message: 'Resend OTP failed..!' });
+                }
+            }
+        }
+        catch (error) {
+            console.log('resend otp error in userController', error);
+        }
+    }
+    async userCreate(req, res) {
+        try {
+            const PostData = req.body;
+            const Response = await this.userCase.userCreate(PostData);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('userCreate error in user Controller', error);
+        }
+    }
+    async getAllPosts(req, res) {
+        try {
+            const userId = req.userId;
+            const userType = req.userType;
+            const Response = await this.userCase.getAllPosts(userId, userType);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('getAllPost error in userController :', error);
+        }
+    }
+    async getAllFeeds(req, res) {
+        try {
+            const userId = req.userId;
+            const userType = req.userType;
+            const Response = await this.userCase.getAllFeeds(userId, userType);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('getAllPost error in userController :', error);
+        }
+    }
+    async getOthersProfile(req, res) {
+        try {
+            const { profileId, profileType } = req.query;
+            const userID = typeof profileId === 'string' ? profileId : undefined;
+            if (userID === undefined) {
+                throw new Error('userId is undefined or not a string');
+            }
+            const userType = typeof profileType === 'string' ? profileType : undefined;
+            if (userID === undefined) {
+                throw new Error('userType is undefined or not a string');
+            }
+            const getPosts = await this.userCase.getAllPosts(userID, profileType);
+            const userData = await this.userCase.getUserData(userID, userType);
+            res.json({ getPosts, userData });
+        }
+        catch (error) {
+            console.log('getOthersProfile error in userController:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    }
+    async getUserData(req, res) {
+        try {
+            const userId = req.userId;
+            const userType = req.userType;
+            const Res = await this.userCase.getUserData(userId, userType);
+            res.json(Res);
+        }
+        catch (error) {
+            console.log('get user data for edit user detail in profile error :', error);
+        }
+    }
+    async updateUserData(req, res) {
+        try {
+            const userId = req.userId;
+            const userType = req.userType;
+            const userData = req.body;
+            const Res = await this.userCase.updateUserData(userData, userId, userType);
+            res.json(Res);
+        }
+        catch (error) {
+            console.log('get user data for edit user detail in profile error :', error);
+        }
+    }
+    async postComment(req, res) {
+        try {
+            console.log(req.body);
+            const Response = await this.userCase.postComment(req.body, req.userId, req.userType);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('postComment error in userController :', error);
+        }
+    }
+    async postReplayComment(req, res) {
+        try {
+            const { postId, replayCommentId, replayComment } = req.body;
+            const Response = await this.userCase.postReplayComment(postId, replayCommentId, replayComment, req.userId, req.userType);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('postComment error in userController :', error);
+        }
+    }
+    async fetchReplayComment(req, res) {
+        try {
+            const { commentId } = req.query;
+            const Response = await this.userCase.fetchReplayComment(commentId);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('postComment error in userController :', error);
+        }
+    }
+    async reportPost(req, res) {
+        try {
+            console.log(req.body);
+            const data = req.body;
+            data.reporterId = req.userId;
+            data.status = 'reported';
+            data.reporterType = req.userType;
+            const Response = await this.userCase.reportPost(data);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('postComment error in userController :', error);
+        }
+    }
+    async deleteComment(req, res) {
+        try {
+            const postData = req.body;
+            postData.userType = req.userType;
+            const Response = await this.userCase.deleteComment(postData);
+            return res.json(Response);
+        }
+        catch (error) {
+            console.log('delete comment error in userController :', error);
+        }
+    }
+    async editComment(req, res) {
+        try {
+            const editData = req.body;
+            console.log(editData);
+            const userType = req.userType;
+            const Response = await this.userCase.editComment(editData, userType);
+            return res.json(Response);
+        }
+        catch (error) {
+            console.log('edit comment error in userController :', error);
+        }
+    }
+    async updateRating(req, res) {
+        try {
+            const RatingData = req.body;
+            console.log('RatingData:', RatingData);
+            const userId = req.userId;
+            const Response = await this.userCase.updateRating(RatingData, userId);
+            return res.json(Response);
+        }
+        catch (error) {
+            console.log('edit comment error in userController :', error);
+        }
+    }
+    async saveOrUnSavePost(req, res) {
+        try {
+            const { postId, isSave } = req.body;
+            const userId = req.userId;
+            const save_or_unsave = isSave ? 'unsave' : 'save';
+            console.log('save or unsave :', save_or_unsave);
+            const Response = await this.userCase.saveOrUnSavePost(postId, save_or_unsave, userId);
+            return res.json(Response);
+        }
+        catch (error) {
+            console.log('saveOrUnSavePost error in userController :', error);
+        }
+    }
+    async likeOrUnLikePost(req, res) {
+        try {
+            const { postId, isLiked } = req.body;
+            const userId = req.userId;
+            const Like_or_unLike = isLiked ? 'unlike' : 'like';
+            console.log('like or unlike :', Like_or_unLike);
+            const Response = await this.userCase.likeOrUnLikePost(postId, Like_or_unLike, userId);
+            return res.json(Response);
+        }
+        catch (error) {
+            console.log('likeOrUnLikePost error in userController :', error);
+        }
+    }
+    async isPostSaved(req, res) {
+        try {
+            const userId = req.userId;
+            const { postId } = req.query;
+            const Response = await this.userCase.isPostSaved(postId, userId);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('isPostSaved error in userController :', error);
+        }
+    }
+    async isPostLiked(req, res) {
+        try {
+            const userId = req.userId;
+            const { postId } = req.query;
+            const Response = await this.userCase.isPostLiked(postId, userId);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('isPostLiked error in userController :', error);
+        }
+    }
+    async fetchPostLikersData(req, res) {
+        try {
+            const { postId } = req.query;
+            const Response = await this.userCase.fetchPostLikersData(postId);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('isPostLiked error in userController :', error);
+        }
+    }
+    async deletePost(req, res) {
+        try {
+            const userId = req.userId;
+            const { postId } = req.query;
+            const Response = await this.userCase.deletePost(postId, userId);
+            res.json(Response);
+        }
+        catch (error) {
+            console.log('deletePost error in userController :', error);
+        }
+    }
+    async uploadImg(req, res) {
+        try {
+            const userProfile = req.body.fileURL;
+            const userId = req.userId;
+            const userType = req.userType;
+            const resp = await this.userCase.uploadUserProfile(userProfile, userId, userType);
+            return res.json(resp);
+        }
+        catch (error) {
+            console.log('uploadImg error in userController :', error);
+        }
+    }
+    async userSearch(req, res) {
+        try {
+            const searchData = req.query.searchData;
+            const userId = req.userId;
+            const userType = req.userType;
+            const resp = await this.userCase.userSearch(searchData, userId, userType);
+            return res.json(resp);
+        }
+        catch (error) {
+            console.log('uploadImg error in userController :', error);
+        }
+    }
+    async setThemeMode(req, res) {
+        try {
+            const mode = req.body.mode;
+            const userId = req.userId;
+            const resp = await this.userCase.setThemeMode(mode, userId);
+            return res.json(resp);
+        }
+        catch (error) {
+            console.log('uploadImg error in userController :', error);
+        }
+    }
+    async getThemeMode(req, res) {
+        try {
+            const userId = req.userId;
+            const resp = await this.userCase.getThemeMode(userId);
+            return res.json(resp);
+        }
+        catch (error) {
+            console.log('uploadImg error in userController :', error);
+        }
+    }
+}
+exports.default = UserController;

@@ -18,11 +18,13 @@ const connectDB = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const mongoUri = process.env.MONGO_URI;
         console.log('mongo URI :-', mongoUri);
+        console.log("Mongo URI:", process.env.MONGO_URI);
         yield mongoose_1.default.connect(mongoUri);
         console.log('mongodb connected');
     }
     catch (error) {
-        console.log('mongodb connection error :', error);
+        console.error("MongoDB connection error:", error.message);
+        console.error(error);
     }
 });
 exports.connectDB = connectDB;
