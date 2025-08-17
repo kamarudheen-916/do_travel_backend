@@ -1,15 +1,16 @@
-import bcrypt from 'bcrypt'
-import IHashPassword from '../../useCase/interface/IhashPassword'
+import bcrypt from 'bcryptjs';
+import IHashPassword from '../../useCase/interface/IhashPassword';
 
-class hashPassword implements IHashPassword{
+class hashPassword implements IHashPassword {
     async createHash(password: string): Promise<string> {
-        const hashedPassword=await bcrypt.hash(password,10)
-        return hashedPassword
+        const hashedPassword = await bcrypt.hash(password, 10);
+        return hashedPassword;
     }
+
     async compare(password: string, hashedPassword: string): Promise<boolean> {
-        const passwordMatch=await bcrypt.compare(password,hashedPassword)
-        return passwordMatch
+        const passwordMatch = await bcrypt.compare(password, hashedPassword);
+        return passwordMatch;
     }
 }
 
-export default hashPassword
+export default hashPassword;
