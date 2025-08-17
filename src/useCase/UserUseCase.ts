@@ -146,7 +146,7 @@ class UserUseCase{
         try {
             if(newPassword === confPass){
                 const RealOTP = await this.generateOTP.generateOTP()
-                const model =  userType === 'user' ? UserModel :PropertyModel
+                const model : any =  userType === 'user' ? UserModel :PropertyModel
                 await model.updateOne({email},{$set:{OTP:RealOTP}})
                 this.sendMail.sendMail(email,email,RealOTP)
                 setTimeout(async () => {
@@ -178,7 +178,7 @@ class UserUseCase{
         await PropertyModel.findOne({email:data.email})
         const RealOTP = User?.OTP
         if(data.OTP == RealOTP){
-                const Model = data.userType === 'user' ? UserModel:PropertyModel
+                const Model : any = data.userType === 'user' ? UserModel:PropertyModel
                 await Model.updateOne({email:data.email},{$set:{password:data.hashedPassword}})
                 return {success:true,message:'Password successfully changed..'}
         }else{

@@ -4,6 +4,7 @@ import MessageModel from "../database/MessageModel2";
 import PropertyModel from "../database/propertyModel";
 import { UserModel } from "../database/userModel";
 import { getReceiverSocketId, io } from "../utils/socketIo";
+import { Types } from "mongoose";
 
 class ChatRepository implements IChatRepository {
     async sendMessage(message: string, senderId: string, receiverId: string): Promise<any> {
@@ -23,9 +24,10 @@ class ChatRepository implements IChatRepository {
                     receiverId,
                     message
                     });
+                    await newMessage.save();
 
           if (newMessage) {
-            conversation.messages.push(newMessage._id);
+            conversation.messages.push(newMessage._id as any);
             }
 
 

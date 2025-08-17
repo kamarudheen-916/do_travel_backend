@@ -11,9 +11,15 @@ const app = (0, express_1.default)();
 exports.app = app;
 const server = http_1.default.createServer(app);
 exports.server = server;
+// const io = new Server(server, {
+//   cors: {
+//     origin: ['http://localhost:5173'],
+//     methods: ['GET', 'POST'],
+//   },
+// });
 const io = new socket_io_1.Server(server, {
     cors: {
-        origin: ['http://localhost:5173'],
+        origin: ['https://do-travel-frontend-z91y.vercel.app'],
         methods: ['GET', 'POST'],
     },
 });

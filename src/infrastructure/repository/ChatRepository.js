@@ -34,6 +34,7 @@ class ChatRepository {
                     receiverId,
                     message
                 });
+                yield newMessage.save();
                 if (newMessage) {
                     conversation.messages.push(newMessage._id);
                 }
