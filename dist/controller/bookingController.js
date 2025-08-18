@@ -13,6 +13,7 @@ class BookingController {
         }
         catch (error) {
             console.log('confirm booking error in booking controller :', error);
+            res.json('oops, something went wrong...');
         }
     }
     async confirmBooking(req, res) {
